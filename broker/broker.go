@@ -33,6 +33,10 @@ import (
 	"github.com/shiguredo/fuji/utils"
 )
 
+const (
+	defaultWillTopic = "will"
+)
+
 type Broker struct {
 	GatewayName   string
 	Name          string `validate:"max=256,regexp=[^/]+,validtopic"`
@@ -169,7 +173,7 @@ func NewBrokers(conf inidef.Config, gwChan chan message.Message) (Brokers, error
 		if values["will_topic"] != "" {
 			broker.WillTopic = strings.Join([]string{broker.TopicPrefix, values["will_topic"]}, "/")
 		} else {
-			broker.WillTopic = strings.Join([]string{broker.TopicPrefix, broker.GatewayName, "will"}, "/")
+			broker.WillTopic = strings.Join([]string{broker.TopicPrefix, broker.GatewayName, defaultWillTopic}, "/")
 		}
 		// Validation
 		if err := validator.Validate(broker); err != nil {
