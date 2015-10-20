@@ -140,12 +140,6 @@ func TestWillSubscribePublishWillWithWillTopic(t *testing.T) {
 	    port = 1883
 	    will_message = msg
 	    will_topic = willtopic
-	[device "dora/dummy"]
-	    broker = local
-	    qos = 0
-	    interval = 10
-	    payload = Hello will just publish world.
-	    type = EnOcean
 `
 	ok := genericWillTestDriver(t, iniStr, "/willtopic", []byte("msg"))
 	if !ok {
@@ -162,12 +156,6 @@ func TestWillSubscribePublishWillWithNestedWillTopic(t *testing.T) {
 	    port = 1883
 	    will_message = msg
 	    will_topic = willtopic/nested
-	[device "dora/dummy"]
-	    broker = local
-	    qos = 0
-	    interval = 10
-	    payload = Hello will just publish world.
-	    type = EnOcean
 `
 	ok := genericWillTestDriver(t, iniStr, "/willtopic/nested", []byte("msg"))
 	if !ok {
