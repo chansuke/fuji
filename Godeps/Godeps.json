@@ -32,11 +32,6 @@
 			"Rev": "ca53cad383cad2479bbba7f7a1a05797ec1386e4"
 		},
 		{
-			"ImportPath": "github.com/shirou/gopsutil/common",
-			"Comment": "1.0.0-160-g82a76c0",
-			"Rev": "82a76c01e3af444ce144b30f228467976ef75864"
-		},
-		{
 			"ImportPath": "github.com/shirou/gopsutil/cpu",
 			"Comment": "1.0.0-160-g82a76c0",
 			"Rev": "82a76c01e3af444ce144b30f228467976ef75864"
