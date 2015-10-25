@@ -50,7 +50,7 @@ func TestConnectLocalPubSub(t *testing.T) {
 	// publised messages confirmed by subscriber
 
 	// get config
-	conf, err := toml.LoadConfig("connectlocalpubsub.ini")
+	conf, err := toml.LoadConfig("connectlocalpubsub.toml")
 	assert.Nil(err)
 
 	// get Gateway

@@ -1,0 +1,21 @@
+[gateway]
+
+    name = "ham"
+
+[[broker."mosquitto/1"]]
+
+    host = "localhost"
+    port = 1883
+
+    retry_interval = 10
+
+
+[[device."dora/dummy"]]
+
+    broker = "mosquitto"
+    qos = 0
+
+    interval = 10
+    payload = "connect local pub only Hello world."
+
+    type = "EnOcean"
