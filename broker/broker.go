@@ -33,6 +33,10 @@ import (
 	"github.com/shiguredo/fuji/utils"
 )
 
+const (
+	defaultWillTopic = "will"
+)
+
 type Broker struct {
 	GatewayName   string
 	Name          string `validate:"max=256,regexp=[^/]+,validtopic"`
@@ -44,6 +48,7 @@ type Broker struct {
 	RetryInterval int    `validate:"min=0"`
 	TopicPrefix   string `validate:"max=256"`
 	WillMessage   []byte `validate:"max=256"`
+	WillTopic     string `validate:"max=256,validtopic"`
 	Tls           bool
 	CaCert        string `validate:"max=256"`
 	TLSConfig     *tls.Config
@@ -165,6 +170,11 @@ func NewBrokers(conf inidef.Config, gwChan chan message.Message) (Brokers, error
 			}
 		}
 
+		if values["will_topic"] != "" {
+			broker.WillTopic = strings.Join([]string{broker.TopicPrefix, values["will_topic"]}, "/")
+		} else {
+			broker.WillTopic = strings.Join([]string{broker.TopicPrefix, broker.GatewayName, defaultWillTopic}, "/")
+		}
 		// Validation
 		if err := validator.Validate(broker); err != nil {
 			return brokers, err
@@ -309,7 +319,7 @@ func MQTTConnect(gwName string, b *Broker) (*MQTT.Client, error) {
 	opts.SetUsername(b.Username)
 	opts.SetPassword(b.Password)
 	if !inidef.IsNil(b.WillMessage) {
-		willTopic := strings.Join([]string{b.TopicPrefix, gwName, "will"}, "/")
+		willTopic := b.WillTopic
 		willQoS := 0
 		opts.SetBinaryWill(willTopic, b.WillMessage, byte(willQoS), true)
 	}
