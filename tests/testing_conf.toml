@@ -1,0 +1,66 @@
+[gateway]
+
+    name = "ham"
+    max_retry_count = 30
+
+[[broker."sango/1"]]
+
+    host = "192.0.2.10"
+    port = 1883
+
+    username = "fuji-gw"
+    password = "123"
+
+    topic_prefix = "fuji-gw@example.com"
+    retry_interval = 10
+
+
+[[broker."sango/2"]]
+
+    host = "192.0.2.11"
+    port = 1883
+
+    username = "fuji-gw"
+    password = 123
+
+    topic_prefix = "fuji-gw@example.com"
+    retry_interval = 10
+
+[[broker."akane"]]
+
+    host = "192.0.2.20"
+    port = 8883
+    tls = true
+    cert = "/path/to/cert"
+
+    username = "fuji-gw"
+    password = 456
+
+[[device."spam/serial"]]
+
+    broker = "sango"
+    qos = 0
+
+    serial = "/dev/tty.ble"
+    baud = 9600
+    size = 4
+    type = "BLE"
+
+[[device."beacon/serial"]]
+
+    broker = "sango"
+    qos = 2
+
+    serial = "/dev/tty.enocean"
+    baud = 115200
+    size = 8
+    type = "EnOcean"
+
+[[device."dora/dummy"]]
+
+    broker = "sango"
+    qos = 2
+
+    interval = 10
+    payload = "Hello world."
+    type = "BLE"

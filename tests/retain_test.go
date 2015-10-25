@@ -26,7 +26,7 @@ import (
 	"github.com/shiguredo/fuji/broker"
 	"github.com/shiguredo/fuji/device"
 	"github.com/shiguredo/fuji/gateway"
-	"github.com/shiguredo/fuji/inidef"
+	"github.com/shiguredo/fuji/toml"
 )
 
 // TestRetainJustPublish tests
@@ -39,23 +39,23 @@ func TestRetainJustPublish(t *testing.T) {
 	
 	    name = retainham
 	
-	[broker "local/1"]
+	[[broker."local/1"]]
 	
-	    host = localhost
+	    host = "localhost"
 	    port = 1883
 	
-	[device "doraretain/dummy"]
+	[[device."doraretain/dummy"]]
 	
-	    broker = local
+	    broker = "local"
 	    qos = 0
 	
 	    interval = 10
-	    payload = Hello world retain true.
+	    payload = "Hello world retain true."
 	
-	    type = EnOcean
+	    type = "EnOcean"
 	    retain = true
 `
-	conf, err := inidef.LoadConfigByte([]byte(iniStr))
+	conf, err := toml.LoadConfigByte([]byte(iniStr))
 	assert.Nil(err)
 	commandChannel := make(chan string)
 	go fuji.StartByFileWithChannel(conf, commandChannel)
@@ -76,24 +76,24 @@ func TestRetainSubscribePublishClose(t *testing.T) {
 	
 	    name = testRetainafterclose
 	
-	[broker "local/1"]
+	[[broker."local/1"]]
 	
-	    host = localhost
+	    host = "localhost"
 	    port = 1883
 	
-	[device "dora/dummy"]
+	[[device."dora/dummy"]]
 	
-	    broker = local
+	    broker = "local"
 	    qos = 0
 	
 	    interval = 10
-	    payload = Hello retained world to subscriber after close.
+	    payload = "Hello retained world to subscriber after close."
 	
-	    type = EnOcean
+	    type = "EnOcean"
 	    retain = true
 `
 	commandChannel := make(chan string)
-	conf, err := inidef.LoadConfigByte([]byte(iniStr))
+	conf, err := toml.LoadConfigByte([]byte(iniStr))
 	assert.Nil(err)
 	go fuji.StartByFileWithChannel(conf, commandChannel)
 
@@ -123,7 +123,7 @@ func TestRetainSubscribePublishClose(t *testing.T) {
 		time.Sleep(2 * time.Second)
 
 		subscriberChannel, err := setupRetainSubscriber(gw, brokerList[0], &dummyDevice)
-		if err != inidef.Error("") {
+		if err != toml.Error("") {
 			t.Error(err)
 		}
 		// check Retained message
@@ -141,7 +141,7 @@ func TestRetainSubscribePublishClose(t *testing.T) {
 }
 
 // setupRetainSubscriber returnes channel in order to read messages with retained flag
-func setupRetainSubscriber(gw *gateway.Gateway, broker *broker.Broker, dummyDevice *device.DummyDevice) (chan [2]string, inidef.Error) {
+func setupRetainSubscriber(gw *gateway.Gateway, broker *broker.Broker, dummyDevice *device.DummyDevice) (chan [2]string, toml.Error) {
 	// Setup MQTT pub/sub client to confirm published content.
 	//
 	messageOutputChannel := make(chan [2]string)
@@ -157,16 +157,16 @@ func setupRetainSubscriber(gw *gateway.Gateway, broker *broker.Broker, dummyDevi
 
 	client := MQTT.NewClient(opts)
 	if client == nil {
-		return nil, inidef.Error("NewClient failed")
+		return nil, toml.Error("NewClient failed")
 	}
 
 	if token := client.Connect(); token.Wait() && token.Error() != nil {
-		return nil, inidef.Error(fmt.Sprintf("NewClient Start failed %q", token.Error()))
+		return nil, toml.Error(fmt.Sprintf("NewClient Start failed %q", token.Error()))
 	}
 	qos := 0
 	retainedTopic := fmt.Sprintf("%s/%s/%s/%s", broker.TopicPrefix, gw.Name, dummyDevice.Name, dummyDevice.Type)
 	client.Subscribe(retainedTopic, byte(qos), func(client *MQTT.Client, msg MQTT.Message) {
 	})
 
-	return messageOutputChannel, inidef.Error("")
+	return messageOutputChannel, toml.Error("")
 }

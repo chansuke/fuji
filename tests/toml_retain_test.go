@@ -15,14 +15,15 @@
 package main
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
 	"github.com/shiguredo/fuji/broker"
 	"github.com/shiguredo/fuji/device"
-	"github.com/shiguredo/fuji/inidef"
 	"github.com/shiguredo/fuji/message"
+	"github.com/shiguredo/fuji/toml"
 )
 
 // iniRetainTestCase はRetain機能のテストの条件を示すデータ型です。
@@ -31,7 +32,7 @@ import (
 // message はテストが失敗した内容の説明
 type iniRetainTestCase struct {
 	iniStr        string
-	expectedError inidef.AnyError
+	expectedError toml.AnyError
 	message       string
 }
 
@@ -39,13 +40,13 @@ var serialDeviceTestcases = []iniRetainTestCase{
 	// check device validation without retain flag
 	{
 		iniStr: `
-		[broker "sango/1"]
-		host = localhost
+		[[broker."sango/1"]]
+		host = "localhost"
 		port = 1883
 
-		[device "hi/serial"]
-		broker = sango
-		serial = /dev/tty
+		[[device."hi/serial"]]
+		broker = "sango"
+		serial = "/dev/tty"
 		baud = 9600
 		qos = 0
 `,
@@ -54,34 +55,32 @@ var serialDeviceTestcases = []iniRetainTestCase{
 	// check device validation with retain flag
 	{
 		iniStr: `
-		[broker "sango/1"]
-		host = localhost
+		[[broker."sango/1"]]
+		host = "localhost"
 		port = 1883
 
-		[device "hi/serial"]
-		broker = sango
-		serial = /dev/tty
+		[[device."hi/serial"]]
+		broker = "sango"
+		serial = "/dev/tty"
 		baud = 9600
 		qos = 0
 		retain = true
-		qos = 0
 `,
 		expectedError: nil,
 		message:       "Retain flag could not be set."},
 	// check device validation with retain flag is false
 	{
 		iniStr: `
-		[broker "sango/1"]
-		host = localhost
+		[[broker."sango/1"]]
+		host = "localhost"
 		port = 1883
 
-		[device "hi/serial"]
-		broker = sango
-		serial = /dev/tty
+		[[device."hi/serial"]]
+		broker = "sango"
+		serial = "/dev/tty"
 		baud = 9600
 		qos = 0
 		retain = false 
-		qos = 0
 `,
 		expectedError: nil,
 		message:       "Retain flag could not be un-set."},
@@ -91,47 +90,47 @@ var dummyDeviceTestcases = []iniRetainTestCase{
 	// check device validation without retain flag
 	{
 		iniStr: `
-		[broker "sango/1"]
-		host = localhost
+		[[broker."sango/1"]]
+		host = "localhost"
 		port = 1883
 
-		[device "hi/dummy"]
-		broker = sango
+		[[device."hi/dummy"]]
+		broker = "sango"
 		qos = 0
 		interval = 10
-		payload = Hello world.
+		payload = "Hello world."
 `,
 		expectedError: nil,
 		message:       "Retain flag could not be omitted. Shall be optional."},
 	// check device validation with retain flag
 	{
 		iniStr: `
-		[broker "sango/1"]
-		host = localhost
+		[[broker."sango/1"]]
+		host = "localhost"
 		port = 1883
 
-		[device "hi/dummy"]
-		broker = sango
+		[[device."hi/dummy"]]
+		broker = "sango"
 		qos = 0
 		retain = true
 		interval = 10
-		payload = Hello world.
+		payload = "Hello world."
 `,
 		expectedError: nil,
 		message:       "Retain flag could not be set."},
 	// check device validation with retain flag is false
 	{
 		iniStr: `
-		[broker "sango/1"]
-		host = localhost
+		[[broker."sango/1"]]
+		host = "localhost"
 		port = 1883
 
-        [device "hi/dummy"]
-		broker = sango
+                [[device."hi/dummy"]]
+		broker = "sango"
 		qos = 0
 		retain = false 
 		interval = 10
-		payload = Hello world.
+		payload = "Hello world."
 `,
 		expectedError: nil,
 		message:       "Retain flag could not be un-set."},
@@ -141,7 +140,7 @@ var dummyDeviceTestcases = []iniRetainTestCase{
 func generalIniRetainSerialDeviceTest(test iniRetainTestCase, t *testing.T) {
 	assert := assert.New(t)
 
-	conf, err := inidef.LoadConfigByte([]byte(test.iniStr))
+	conf, err := toml.LoadConfigByte([]byte(test.iniStr))
 	assert.Nil(err)
 
 	brokers, err := broker.NewBrokers(conf, make(chan message.Message))
@@ -156,7 +155,7 @@ func generalIniRetainSerialDeviceTest(test iniRetainTestCase, t *testing.T) {
 func generalIniRetainDummyDeviceTest(test iniRetainTestCase, t *testing.T) {
 	assert := assert.New(t)
 
-	conf, err := inidef.LoadConfigByte([]byte(test.iniStr))
+	conf, err := toml.LoadConfigByte([]byte(test.iniStr))
 	assert.Nil(err)
 
 	brokers, err := broker.NewBrokers(conf, make(chan message.Message))
@@ -173,8 +172,11 @@ func generalIniRetainDummyDeviceTest(test iniRetainTestCase, t *testing.T) {
 
 // TestIniRetainDeviceAll tests a serial device using test code
 func TestIniRetainDeviceAll(t *testing.T) {
+	i := 0
 	for _, testcase := range serialDeviceTestcases {
+		fmt.Println(i)
 		generalIniRetainSerialDeviceTest(testcase, t)
+		i++
 	}
 }
 
