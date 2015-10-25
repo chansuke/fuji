@@ -131,6 +131,38 @@ func TestWillSubscribePublishBinaryWill(t *testing.T) {
 	}
 }
 
+func TestWillSubscribePublishWillWithWillTopic(t *testing.T) {
+	iniStr := `
+	[gateway]
+	    name = with
+	[broker "local/1"]
+	    host = localhost
+	    port = 1883
+	    will_message = msg
+	    will_topic = willtopic
+`
+	ok := genericWillTestDriver(t, iniStr, "/willtopic", []byte("msg"))
+	if !ok {
+		t.Error("Failed to receive Empty Will message")
+	}
+}
+
+func TestWillSubscribePublishWillWithNestedWillTopic(t *testing.T) {
+	iniStr := `
+	[gateway]
+	    name = with
+	[broker "local/1"]
+	    host = localhost
+	    port = 1883
+	    will_message = msg
+	    will_topic = willtopic/nested
+`
+	ok := genericWillTestDriver(t, iniStr, "/willtopic/nested", []byte("msg"))
+	if !ok {
+		t.Error("Failed to receive Empty Will message")
+	}
+}
+
 // genericWillTestDriver
 // 1. read config string
 // 2. connect subscriber and publisher to localhost broker with will message
