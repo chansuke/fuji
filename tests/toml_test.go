@@ -71,7 +71,7 @@ func TestIniNewDummyDevice(t *testing.T) {
 	brokerList, err := broker.NewBrokers(conf, make(chan message.Message))
 	assert.Nil(err)
 
-	dummy, err := device.NewDummyDevice(conf.Sections[7], brokerList, device.NewDeviceChannel())
+	dummy, err := device.NewDummyDevice(conf.Sections[6], brokerList, device.NewDeviceChannel())
 	assert.Nil(err)
 	assert.Equal("dummy", dummy.DeviceType())
 	assert.Equal(2, int(dummy.QoS))

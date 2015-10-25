@@ -160,7 +160,7 @@ func generalIniRetainDummyDeviceTest(test iniRetainTestCase, t *testing.T) {
 	brokers, err := broker.NewBrokers(conf, make(chan message.Message))
 	assert.Nil(err)
 
-	dummy, err := device.NewDummyDevice(conf.Sections[2], brokers, device.NewDeviceChannel())
+	dummy, err := device.NewDummyDevice(conf.Sections[1], brokers, device.NewDeviceChannel())
 	if test.expectedError == nil {
 		assert.Nil(err)
 		assert.NotNil(dummy)

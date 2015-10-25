@@ -109,7 +109,7 @@ func TestRetainSubscribePublishClose(t *testing.T) {
 
 	devChan := device.NewDeviceChannel()
 	gw.DeviceChannels = append(gw.DeviceChannels, devChan)
-	dummyDevice, err := device.NewDummyDevice(conf.Sections[3], brokerList, devChan)
+	dummyDevice, err := device.NewDummyDevice(conf.Sections[2], brokerList, devChan)
 	if err != nil {
 		t.Error("Cannot make DummyDeviceList")
 	}
