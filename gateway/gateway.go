@@ -28,8 +28,8 @@ import (
 
 	"github.com/shiguredo/fuji/broker"
 	"github.com/shiguredo/fuji/device"
-	"github.com/shiguredo/fuji/inidef"
 	"github.com/shiguredo/fuji/message"
+	"github.com/shiguredo/fuji/toml"
 )
 
 type Gateway struct {
@@ -55,7 +55,7 @@ const (
 )
 
 func init() {
-	validator.SetValidationFunc("validtopic", inidef.ValidMqttPublishTopic)
+	validator.SetValidationFunc("validtopic", toml.ValidMqttPublishTopic)
 }
 
 func (gateway Gateway) String() string {
@@ -63,8 +63,8 @@ func (gateway Gateway) String() string {
 }
 
 // NewGateway returns Gateway instance with config object
-func NewGateway(conf inidef.Config) (*Gateway, error) {
-	var section inidef.ConfigSection
+func NewGateway(conf toml.Config) (*Gateway, error) {
+	var section toml.ConfigSection
 	for _, s := range conf.Sections {
 		if s.Type == "gateway" {
 			section = s
