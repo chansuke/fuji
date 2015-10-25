@@ -68,7 +68,7 @@ func TestWillSubscribePublishClose(t *testing.T) {
 
 	iniStr := `
 	[gateway]
-	    name = testwillafterclose
+	    name = "testwillafterclose"
 	[[broker."local/1"]]
 	    host = "localhost"
 	    port = 1883
@@ -92,7 +92,7 @@ func TestWillSubscribePublishClose(t *testing.T) {
 func TestWillSubscribePublishCloseEmpty(t *testing.T) {
 	iniStr := `
 	[gateway]
-	    name = testwillaftercloseemptywill
+	    name = "testwillaftercloseemptywill"
 	[[broker."local/1"]]
 	    host = "localhost"
 	    port = 1883
@@ -113,11 +113,11 @@ func TestWillSubscribePublishCloseEmpty(t *testing.T) {
 func TestWillSubscribePublishBinaryWill(t *testing.T) {
 	iniStr := `
 	[gateway]
-	    name = binary
+	    name = "binary"
 	[[broker."local/1"]]
 	    host = "localhost"
 	    port = 1883
-	    will_message = "\x01\x02"
+	    will_message = "\\x01\\x02"
 	[[device."dora/dummy"]]
 	    broker = "local"
 	    qos = 0
@@ -134,12 +134,12 @@ func TestWillSubscribePublishBinaryWill(t *testing.T) {
 func TestWillSubscribePublishWillWithWillTopic(t *testing.T) {
 	iniStr := `
 	[gateway]
-	    name = with
-	[broker "local/1"]
-	    host = localhost
+	    name = "with"
+	[[broker."local/1"]]
+	    host = "localhost"
 	    port = 1883
-	    will_message = msg
-	    will_topic = willtopic
+	    will_message = "msg"
+	    will_topic = "willtopic"
 `
 	ok := genericWillTestDriver(t, iniStr, "/willtopic", []byte("msg"))
 	if !ok {
@@ -150,12 +150,12 @@ func TestWillSubscribePublishWillWithWillTopic(t *testing.T) {
 func TestWillSubscribePublishWillWithNestedWillTopic(t *testing.T) {
 	iniStr := `
 	[gateway]
-	    name = with
-	[broker "local/1"]
-	    host = localhost
+	    name = "with"
+	[[broker."local/1"]]
+	    host = "localhost"
 	    port = 1883
-	    will_message = msg
-	    will_topic = willtopic/nested
+	    will_message = "msg"
+	    will_topic = "willtopic/nested"
 `
 	ok := genericWillTestDriver(t, iniStr, "/willtopic/nested", []byte("msg"))
 	if !ok {

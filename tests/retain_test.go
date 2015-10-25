@@ -37,7 +37,7 @@ func TestRetainJustPublish(t *testing.T) {
 	iniStr := `
 	[gateway]
 	
-	    name = retainham
+	    name = "retainham"
 	
 	[[broker."local/1"]]
 	
@@ -74,7 +74,7 @@ func TestRetainSubscribePublishClose(t *testing.T) {
 	iniStr := `
 	[gateway]
 	
-	    name = testRetainafterclose
+	    name = "testRetainafterclose"
 	
 	[[broker."local/1"]]
 	
