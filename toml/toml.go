@@ -54,6 +54,7 @@ type ConfigToml struct {
 	Gateway SectionMap `toml:"gateway"`
 	Brokers SectionMap `toml:"broker"`
 	Devices SectionMap `toml:"device"`
+	Status  SectionMap `toml:"status"`
 }
 
 type SectionMap map[string]interface{}
@@ -111,6 +112,10 @@ func addConfigSections(configSections []ConfigSection, title string, sectionMap 
 					valueMap[k] = v.(string)
 				}
 			}
+		}
+
+		if len(valueMap) == 0 {
+			continue
 		}
 
 		rt := ConfigSection{
@@ -207,12 +212,72 @@ func LoadConfigByte(conf []byte) (Config, error) {
 
 	}
 
-	rt := ConfigSection{
-		Title:  "gateway",
-		Type:   "gateway",
-		Values: valueMap,
+	if len(valueMap) > 0 {
+		rt := ConfigSection{
+			Title:  "gateway",
+			Type:   "gateway",
+			Values: valueMap,
+		}
+		sections = append(sections, rt)
 	}
-	sections = append(sections, rt)
+
+	// status section
+	valueMap = make(ValueMap)
+	for name, value := range configToml.Status {
+
+		switch value.(type) {
+		case int64:
+			valueMap[name] = strconv.FormatInt(value.(int64), 10)
+		case bool:
+			valueMap[name] = strconv.FormatBool(value.(bool))
+		case []map[string]interface{}:
+			// do nothing
+		default:
+			valueMap[name] = value.(string)
+		}
+
+	}
+	if len(valueMap) > 0 {
+		rt := ConfigSection{
+			Title:  "status",
+			Type:   "status",
+			Values: valueMap,
+		}
+		sections = append(sections, rt)
+	}
+
+	for name, value := range configToml.Status {
+
+		valueMap := make(ValueMap)
+		switch value.(type) {
+		case []map[string]interface{}:
+			{
+				m := value.([]map[string]interface{})
+				for _, v := range m {
+					for k, vv := range v {
+						switch vv.(type) {
+						case int64:
+							valueMap[k] = strconv.FormatInt(vv.(int64), 10)
+						case bool:
+							valueMap[k] = strconv.FormatBool(vv.(bool))
+						default:
+							valueMap[k] = vv.(string)
+						}
+					}
+				}
+			}
+		}
+
+		if len(valueMap) > 0 {
+			rt := ConfigSection{
+				Title:  "status",
+				Type:   "status",
+				Name:   name,
+				Values: valueMap,
+			}
+			sections = append(sections, rt)
+		}
+	}
 
 	// broker sections
 	sections = addConfigSections(sections, "broker", configToml.Brokers)
