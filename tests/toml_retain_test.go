@@ -15,7 +15,6 @@
 package main
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -174,7 +173,6 @@ func generalIniRetainDummyDeviceTest(test iniRetainTestCase, t *testing.T) {
 func TestIniRetainDeviceAll(t *testing.T) {
 	i := 0
 	for _, testcase := range serialDeviceTestcases {
-		fmt.Println(i)
 		generalIniRetainSerialDeviceTest(testcase, t)
 		i++
 	}
