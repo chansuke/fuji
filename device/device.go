@@ -18,8 +18,8 @@ import (
 	log "github.com/Sirupsen/logrus"
 
 	"github.com/shiguredo/fuji/broker"
-	"github.com/shiguredo/fuji/inidef"
 	"github.com/shiguredo/fuji/message"
+	"github.com/shiguredo/fuji/toml"
 )
 
 type Devicer interface {
@@ -30,7 +30,7 @@ type Devicer interface {
 }
 
 // NewDevices is a factory method to create various kind of devices from ini.File
-func NewDevices(conf inidef.Config, brokers []*broker.Broker) ([]Devicer, []DeviceChannel, error) {
+func NewDevices(conf toml.Config, brokers []*broker.Broker) ([]Devicer, []DeviceChannel, error) {
 	var ret []Devicer
 	var devChannels []DeviceChannel
 

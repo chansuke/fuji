@@ -19,7 +19,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/shiguredo/fuji/inidef"
+	"github.com/shiguredo/fuji/toml"
 )
 
 func TestParseStatus(t *testing.T) {
@@ -40,18 +40,18 @@ func TestStatus(t *testing.T) {
 	assert := assert.New(t)
 
 	iniStr := `
-[broker "sango"]
-  host = 192.168.1.20
+[[broker."sango"]]
+  host = "192.168.1.20"
   port = 1033
-[status "cpu"]
-  cpu_times = user, system, idle, nice, iowait, irq, softirq, guest
-[status "memory"]
-  virtual_memory = total, available, percent, used, free
+[[status."cpu"]]
+  cpu_times = "user, system, idle, nice, iowait, irq, softirq, guest"
+[[status."memory"]]
+  virtual_memory = "total, available, percent, used, free"
 [status]
-  broker = sango
+  broker = "sango"
   interval = 10
 `
-	conf, err := inidef.LoadConfigByte([]byte(iniStr))
+	conf, err := toml.LoadConfigByte([]byte(iniStr))
 	assert.Nil(err)
 	tt, err := NewStatus(conf)
 	assert.Nil(err)
@@ -63,6 +63,7 @@ func TestStatus(t *testing.T) {
 
 	assert.Equal(8, len(st.CPU.CpuTimes))
 	assert.Equal(5, len(st.Memory.VirtualMemory))
+
 }
 
 func TestCPUGet(t *testing.T) {

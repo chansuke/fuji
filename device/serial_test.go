@@ -20,25 +20,25 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/shiguredo/fuji/broker"
-	"github.com/shiguredo/fuji/inidef"
+	"github.com/shiguredo/fuji/toml"
 )
 
 func TestNewSerialDevice(t *testing.T) {
 	assert := assert.New(t)
 
 	iniStr := `
-[device "dora/serial"]
-    broker = sango
+[[device."dora/serial"]]
+    broker = "sango"
     qos = 1
-    serial = /dev/tty.ble
+    serial = "/dev/tty.ble"
     baud = 9600
     size = 4
-    type = BLE
+    type = "BLE"
 `
-	conf, err := inidef.LoadConfigByte([]byte(iniStr))
+	conf, err := toml.LoadConfigByte([]byte(iniStr))
 	b1 := &broker.Broker{Name: "sango"}
 	brokers := []*broker.Broker{b1}
-	b, err := NewSerialDevice(conf.Sections[1], brokers, NewDeviceChannel())
+	b, err := NewSerialDevice(conf.Sections[0], brokers, NewDeviceChannel())
 	assert.Nil(err)
 	assert.NotNil(b.Broker)
 	assert.Equal("dora", b.Name)
@@ -51,17 +51,17 @@ func TestNewSerialDeviceNotSetSize(t *testing.T) {
 	assert := assert.New(t)
 
 	iniStr := `
-[device "dora/serial"]
-    broker = sango
+[[device."dora/serial"]]
+    broker = "sango"
     qos = 1
-    serial = /dev/tty.ble
+    serial = "/dev/tty.ble"
     baud = 9600
-    type = BLE
+    type = "BLE"
 `
-	conf, err := inidef.LoadConfigByte([]byte(iniStr))
+	conf, err := toml.LoadConfigByte([]byte(iniStr))
 	b1 := &broker.Broker{Name: "sango"}
 	brokers := []*broker.Broker{b1}
-	b, err := NewSerialDevice(conf.Sections[1], brokers, NewDeviceChannel())
+	b, err := NewSerialDevice(conf.Sections[0], brokers, NewDeviceChannel())
 	assert.Nil(err)
 	assert.NotNil(b.Broker)
 	assert.Equal("dora", b.Name)
@@ -73,15 +73,15 @@ func TestNewSerialDeviceInvalidInterval(t *testing.T) {
 	assert := assert.New(t)
 
 	iniStr := `
-[device "dora/serial"]
-    broker = sango
+[[device."dora/serial"]]
+    broker = "sango"
     interval = -1
     qos = 1
 `
-	conf, err := inidef.LoadConfigByte([]byte(iniStr))
+	conf, err := toml.LoadConfigByte([]byte(iniStr))
 	b1 := &broker.Broker{Name: "sango"}
 	brokers := []*broker.Broker{b1}
-	_, err = NewSerialDevice(conf.Sections[1], brokers, NewDeviceChannel())
+	_, err = NewSerialDevice(conf.Sections[0], brokers, NewDeviceChannel())
 	assert.NotNil(err)
 }
 
@@ -89,14 +89,14 @@ func TestNewSerialDeviceInvalidQoS(t *testing.T) {
 	assert := assert.New(t)
 
 	iniStr := `
-[device "dora/serial"]
-    broker = sango
+[[device."dora/serial"]]
+    broker = "sango"
     qos = -1
 `
-	conf, err := inidef.LoadConfigByte([]byte(iniStr))
+	conf, err := toml.LoadConfigByte([]byte(iniStr))
 	b1 := &broker.Broker{Name: "sango"}
 	brokers := []*broker.Broker{b1}
-	_, err = NewSerialDevice(conf.Sections[1], brokers, NewDeviceChannel())
+	_, err = NewSerialDevice(conf.Sections[0], brokers, NewDeviceChannel())
 	assert.NotNil(err)
 }
 
@@ -104,14 +104,14 @@ func TestNewSerialDeviceInvalidBroker(t *testing.T) {
 	assert := assert.New(t)
 
 	iniStr := `
-[device "dora/serial"]
-    broker = doesNotExist
+[[device."dora/serial"]]
+    broker = "doesNotExist"
     qos = 1
 `
-	conf, err := inidef.LoadConfigByte([]byte(iniStr))
+	conf, err := toml.LoadConfigByte([]byte(iniStr))
 	b1 := &broker.Broker{Name: "sango"}
 	brokers := []*broker.Broker{b1}
-	_, err = NewSerialDevice(conf.Sections[1], brokers, NewDeviceChannel())
+	_, err = NewSerialDevice(conf.Sections[0], brokers, NewDeviceChannel())
 	assert.NotNil(err)
 }
 
@@ -119,15 +119,15 @@ func TestNewSerialDeviceInvalidBaud(t *testing.T) {
 	assert := assert.New(t)
 
 	iniStr := `
-[device "dora/serial"]
-    broker = sango
+[[device."dora/serial"]]
+    broker = "sango"
     qos = -1
     baud = -9600
 `
-	conf, err := inidef.LoadConfigByte([]byte(iniStr))
+	conf, err := toml.LoadConfigByte([]byte(iniStr))
 	b1 := &broker.Broker{Name: "sango"}
 	brokers := []*broker.Broker{b1}
-	_, err = NewSerialDevice(conf.Sections[1], brokers, NewDeviceChannel())
+	_, err = NewSerialDevice(conf.Sections[0], brokers, NewDeviceChannel())
 	assert.NotNil(err)
 }
 

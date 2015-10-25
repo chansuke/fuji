@@ -20,24 +20,25 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/shiguredo/fuji/broker"
-	"github.com/shiguredo/fuji/inidef"
+	"github.com/shiguredo/fuji/toml"
 )
 
 func TestNewDummyDevice(t *testing.T) {
 	assert := assert.New(t)
 
 	iniStr := `
-[device "dora/dummy"]
-    broker = sango
+[[device."dora/dummy"]]
+    broker = "sango"
     qos = 1
     dummy = true
     interval = 10
-    payload = Hello world.
+    payload = "Hello world."
 `
-	conf, err := inidef.LoadConfigByte([]byte(iniStr))
+	conf, err := toml.LoadConfigByte([]byte(iniStr))
+	assert.Nil(err)
 	b1 := &broker.Broker{Name: "sango"}
 	brokers := []*broker.Broker{b1}
-	b, err := NewDummyDevice(conf.Sections[1], brokers, NewDeviceChannel())
+	b, err := NewDummyDevice(conf.Sections[0], brokers, NewDeviceChannel())
 	assert.Nil(err)
 	assert.NotNil(b.Broker)
 	assert.Equal("dora", b.Name)
@@ -50,15 +51,16 @@ func TestNewDummyDeviceInvalidInterval(t *testing.T) {
 	assert := assert.New(t)
 
 	iniStr := `
-[device "dora/dummy"]
-    broker = sango
+[[device."dora/dummy"]]
+    broker = "sango"
     interval = -1
     qos = 1
 `
-	conf, err := inidef.LoadConfigByte([]byte(iniStr))
+	conf, err := toml.LoadConfigByte([]byte(iniStr))
+	assert.Nil(err)
 	b1 := &broker.Broker{Name: "sango"}
 	brokers := []*broker.Broker{b1}
-	_, err = NewDummyDevice(conf.Sections[1], brokers, NewDeviceChannel())
+	_, err = NewDummyDevice(conf.Sections[0], brokers, NewDeviceChannel())
 	assert.NotNil(err)
 }
 
@@ -66,15 +68,16 @@ func TestNewDummyDeviceInvalidQoS(t *testing.T) {
 	assert := assert.New(t)
 
 	iniStr := `
-[device "dora/dummy"]
-    broker = sango
+[[device."dora/dummy"]]
+    broker = "sango"
     interval = -1
     qos = -1
 `
-	conf, err := inidef.LoadConfigByte([]byte(iniStr))
+	conf, err := toml.LoadConfigByte([]byte(iniStr))
+	assert.Nil(err)
 	b1 := &broker.Broker{Name: "sango"}
 	brokers := []*broker.Broker{b1}
-	_, err = NewDummyDevice(conf.Sections[1], brokers, NewDeviceChannel())
+	_, err = NewDummyDevice(conf.Sections[0], brokers, NewDeviceChannel())
 	assert.NotNil(err)
 }
 
@@ -82,14 +85,15 @@ func TestNewDummyDeviceInvalidBroker(t *testing.T) {
 	assert := assert.New(t)
 
 	iniStr := `
-[device "dora/dummy"]
-    broker = doesNotExist
+[[device."dora/dummy"]]
+    broker = "doesNotExist"
     interval = 10
     qos = 1
 `
-	conf, err := inidef.LoadConfigByte([]byte(iniStr))
+	conf, err := toml.LoadConfigByte([]byte(iniStr))
+	assert.Nil(err)
 	b1 := &broker.Broker{Name: "sango"}
 	brokers := []*broker.Broker{b1}
-	_, err = NewDummyDevice(conf.Sections[1], brokers, NewDeviceChannel())
+	_, err = NewDummyDevice(conf.Sections[0], brokers, NewDeviceChannel())
 	assert.NotNil(err)
 }

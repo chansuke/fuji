@@ -26,8 +26,8 @@ import (
 	validator "gopkg.in/validator.v2"
 
 	"github.com/shiguredo/fuji/broker"
-	"github.com/shiguredo/fuji/inidef"
 	"github.com/shiguredo/fuji/message"
+	"github.com/shiguredo/fuji/toml"
 )
 
 type SerialDevice struct {
@@ -54,9 +54,9 @@ func (device SerialDevice) String() string {
 	return fmt.Sprintf("%#v", device)
 }
 
-// NewSerialDevice read inidef.ConfigSection and returnes SerialDevice.
+// NewSerialDevice read toml.ConfigSection and returnes SerialDevice.
 // If config validation failed, return error
-func NewSerialDevice(section inidef.ConfigSection, brokers []*broker.Broker, devChan DeviceChannel) (SerialDevice, error) {
+func NewSerialDevice(section toml.ConfigSection, brokers []*broker.Broker, devChan DeviceChannel) (SerialDevice, error) {
 	ret := SerialDevice{
 		Name:       section.Name,
 		DeviceChan: devChan,
@@ -85,7 +85,7 @@ func NewSerialDevice(section inidef.ConfigSection, brokers []*broker.Broker, dev
 		ret.QoS = byte(qos)
 	}
 	// TODO: check it is true or not
-	// ret.InputPort = InputPortType(inidef.INPUT_PORT_SERIAL)
+	// ret.InputPort = InputPortType(INPUT_PORT_SERIAL)
 	ret.InputPort = InputPortType(INPUT_PORT_DUMMY)
 	ret.Serial = values["serial"]
 	baud, err := strconv.Atoi(values["baud"])
@@ -124,7 +124,7 @@ func NewSerialDevice(section inidef.ConfigSection, brokers []*broker.Broker, dev
 
 func (device *SerialDevice) Validate() error {
 	validator := validator.NewValidator()
-	validator.SetValidationFunc("validtopic", inidef.ValidMqttPublishTopic)
+	validator.SetValidationFunc("validtopic", toml.ValidMqttPublishTopic)
 	if err := validator.Validate(device); err != nil {
 		return err
 	}

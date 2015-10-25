@@ -25,8 +25,8 @@ import (
 	"github.com/shirou/gopsutil/mem"
 	validator "gopkg.in/validator.v2"
 
-	"github.com/shiguredo/fuji/inidef"
 	"github.com/shiguredo/fuji/message"
+	"github.com/shiguredo/fuji/toml"
 )
 
 type CPUStatus struct {
@@ -143,7 +143,7 @@ func (m MemoryStatus) Get() []message.Message {
 }
 
 // NewStatus returnes status from ini File, not ini.Section.
-func NewStatus(conf inidef.Config) (Devicer, error) {
+func NewStatus(conf toml.Config) (Devicer, error) {
 	ret := Status{
 		Name:        "status",
 		GatewayName: conf.GatewayName,
@@ -154,6 +154,7 @@ func NewStatus(conf inidef.Config) (Devicer, error) {
 		if section.Type != "status" {
 			continue
 		}
+
 		if section.Name != "" { // skip if status child group
 			continue
 		}
@@ -227,7 +228,7 @@ func NewStatus(conf inidef.Config) (Devicer, error) {
 
 func (device *Status) Validate() error {
 	validator := validator.NewValidator()
-	validator.SetValidationFunc("validtopic", inidef.ValidMqttPublishTopic)
+	validator.SetValidationFunc("validtopic", toml.ValidMqttPublishTopic)
 	if err := validator.Validate(device); err != nil {
 		return err
 	}
