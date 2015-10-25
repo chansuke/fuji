@@ -33,7 +33,7 @@ import (
 // dummydevice is used as a source of published message
 func TestConnectLocalPub(t *testing.T) {
 
-	go fuji.Start("connectlocalpub.ini")
+	go fuji.Start("connectlocalpub.toml")
 
 	time.Sleep(2 * time.Second)
 }
