@@ -28,8 +28,8 @@ import (
 	log "github.com/Sirupsen/logrus"
 	validator "gopkg.in/validator.v2"
 
-	"github.com/shiguredo/fuji/inidef"
 	"github.com/shiguredo/fuji/message"
+	"github.com/shiguredo/fuji/toml"
 	"github.com/shiguredo/fuji/utils"
 )
 
@@ -75,7 +75,7 @@ func (bs Brokers) Less(i, j int) bool {
 
 // init is automatically invoked at initial time.
 func init() {
-	validator.SetValidationFunc("validtopic", inidef.ValidMqttPublishTopic)
+	validator.SetValidationFunc("validtopic", toml.ValidMqttPublishTopic)
 }
 
 // NewTLSConfig returns TLS config from CA Cert file path.
@@ -83,11 +83,11 @@ func NewTLSConfig(caCertFilePath string) (*tls.Config, error) {
 	certPool := x509.NewCertPool()
 	pemCerts, err := ioutil.ReadFile(caCertFilePath)
 	if err != nil {
-		return nil, inidef.Error("Cert File could not be read.")
+		return nil, toml.Error("Cert File could not be read.")
 	}
 	appendCertOk := certPool.AppendCertsFromPEM(pemCerts)
 	if appendCertOk != true {
-		return nil, inidef.Error("Server Certificate parse failed")
+		return nil, toml.Error("Server Certificate parse failed")
 	}
 
 	// only server certificate checked
@@ -101,9 +101,9 @@ func NewTLSConfig(caCertFilePath string) (*tls.Config, error) {
 	}, nil
 }
 
-// NewBrokers returns []*Broker from inidef.Config.
+// NewBrokers returns []*Broker from toml.Config.
 // If validation failes, retrun error.
-func NewBrokers(conf inidef.Config, gwChan chan message.Message) (Brokers, error) {
+func NewBrokers(conf toml.Config, gwChan chan message.Message) (Brokers, error) {
 	var brokers Brokers
 
 	for _, section := range conf.Sections {
@@ -308,7 +308,7 @@ func MQTTConnect(gwName string, b *Broker) (*MQTT.Client, error) {
 
 	opts.SetUsername(b.Username)
 	opts.SetPassword(b.Password)
-	if !inidef.IsNil(b.WillMessage) {
+	if !toml.IsNil(b.WillMessage) {
 		willTopic := strings.Join([]string{b.TopicPrefix, gwName, "will"}, "/")
 		willQoS := 0
 		opts.SetBinaryWill(willTopic, b.WillMessage, byte(willQoS), true)
