@@ -62,7 +62,7 @@ func TestConnectLocalPubSub(t *testing.T) {
 	assert.Nil(err)
 
 	// get DummyDevice
-	dummyDevice, err := device.NewDummyDevice(conf.Sections[3], brokerList, device.NewDeviceChannel())
+	dummyDevice, err := device.NewDummyDevice(conf.Sections[2], brokerList, device.NewDeviceChannel())
 	assert.Nil(err)
 	assert.NotNil(dummyDevice)
 
