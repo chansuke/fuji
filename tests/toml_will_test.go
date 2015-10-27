@@ -90,7 +90,7 @@ var testcases = []iniWillTestCase{
 
                 [[broker."sango/2"]]
 
-                    host = "192.168.1.1 "
+                    host = "192.168.1.1"
                     port = 1883
 		    will_message = "Hello world."
 `,
