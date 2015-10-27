@@ -25,7 +25,7 @@ import (
 )
 
 type iniWillTestCase struct {
-	iniStr        string          // testcase config file
+	configStr     string          // testcase config file
 	expectedError config.AnyError // expected error status
 	message       string          // message when failed
 }
@@ -33,7 +33,7 @@ type iniWillTestCase struct {
 var testcases = []iniWillTestCase{
 	// tests broker validation without will_message
 	{
-		iniStr: `
+		configStr: `
                 [[broker."sango/1"]]
 
                     host = "localhost"
@@ -43,7 +43,7 @@ var testcases = []iniWillTestCase{
 		message:       "WillMessage could not be omitted. Shall be optional."},
 	// tests broker validation with will_message
 	{
-		iniStr: `
+		configStr: `
                 [[broker."sango/1"]]
 
                     host = "localhost"
@@ -54,7 +54,7 @@ var testcases = []iniWillTestCase{
 		message:       "WillMessage could not be defined."},
 	// tests broker validation with empty will_message
 	{
-		iniStr: `
+		configStr: `
                 [[broker."sango/1"]]
 
                     host = "localhost"
@@ -65,7 +65,7 @@ var testcases = []iniWillTestCase{
 		message:       "Empty WillMessage could not be defined."},
 	// tests multiple broker validation with only one will_message
 	{
-		iniStr: `
+		configStr: `
                 [[broker."sango/1"]]
 
                     host = "localhost"
@@ -81,7 +81,7 @@ var testcases = []iniWillTestCase{
 		message:       "WillMessage could not be defined for one of two."},
 	// tests multiple broker validation with both will_message
 	{
-		iniStr: `
+		configStr: `
                 [[broker."sango/1"]]
 
                     host = "localhost"
@@ -101,7 +101,7 @@ var testcases = []iniWillTestCase{
 func generalIniWillTest(test iniWillTestCase, t *testing.T) {
 	assert := assert.New(t)
 
-	conf, err := config.LoadConfigByte([]byte(test.iniStr))
+	conf, err := config.LoadConfigByte([]byte(test.configStr))
 	assert.Nil(err)
 
 	brokers, err := broker.NewBrokers(conf, make(chan message.Message))

@@ -35,7 +35,7 @@ import (
 func TestWillJustPublish(t *testing.T) {
 	assert := assert.New(t)
 
-	iniStr := `
+	configStr := `
 	[gateway]
 	    name = "willjustpublishham"
 	[[broker."local/1"]]
@@ -49,7 +49,7 @@ func TestWillJustPublish(t *testing.T) {
 	    payload = "Hello will just publish world."
 	    type = "EnOcean"
 `
-	conf, err := config.LoadConfigByte([]byte(iniStr))
+	conf, err := config.LoadConfigByte([]byte(configStr))
 	assert.Nil(err)
 	commandChannel := make(chan string)
 	go fuji.StartByFileWithChannel(conf, commandChannel)
@@ -66,7 +66,7 @@ func TestWillJustPublish(t *testing.T) {
 func TestWillSubscribePublishClose(t *testing.T) {
 	assert := assert.New(t)
 
-	iniStr := `
+	configStr := `
 	[gateway]
 	    name = "testwillafterclose"
 	[[broker."local/1"]]
@@ -80,7 +80,7 @@ func TestWillSubscribePublishClose(t *testing.T) {
 	    payload = "Hello will just publish world."
 	    type = "EnOcean"
 `
-	ok := genericWillTestDriver(t, iniStr, "/testwillafterclose/will", []byte("good letter is no letter."))
+	ok := genericWillTestDriver(t, configStr, "/testwillafterclose/will", []byte("good letter is no letter."))
 	assert.True(ok, "Failed to receive Will message")
 }
 
@@ -90,7 +90,7 @@ func TestWillSubscribePublishClose(t *testing.T) {
 // 3. force disconnect
 // 4. check subscriber receives will message
 func TestWillSubscribePublishCloseEmpty(t *testing.T) {
-	iniStr := `
+	configStr := `
 	[gateway]
 	    name = "testwillaftercloseemptywill"
 	[[broker."local/1"]]
@@ -104,14 +104,14 @@ func TestWillSubscribePublishCloseEmpty(t *testing.T) {
 	    payload = "Hello will just publish world."
 	    type = "EnOcean"
 `
-	ok := genericWillTestDriver(t, iniStr, "/testwillaftercloseemptywill/will", []byte{})
+	ok := genericWillTestDriver(t, configStr, "/testwillaftercloseemptywill/will", []byte{})
 	if !ok {
 		t.Error("Failed to receive Empty Will message")
 	}
 }
 
 func TestWillSubscribePublishBinaryWill(t *testing.T) {
-	iniStr := `
+	configStr := `
 	[gateway]
 	    name = "binary"
 	[[broker."local/1"]]
@@ -125,14 +125,14 @@ func TestWillSubscribePublishBinaryWill(t *testing.T) {
 	    payload = "Hello will just publish world."
 	    type = "EnOcean"
 `
-	ok := genericWillTestDriver(t, iniStr, "/binary/will", []byte{1, 2})
+	ok := genericWillTestDriver(t, configStr, "/binary/will", []byte{1, 2})
 	if !ok {
 		t.Error("Failed to receive Empty Will message")
 	}
 }
 
 func TestWillSubscribePublishWillWithWillTopic(t *testing.T) {
-	iniStr := `
+	configStr := `
 	[gateway]
 	    name = "with"
 	[[broker."local/1"]]
@@ -141,14 +141,14 @@ func TestWillSubscribePublishWillWithWillTopic(t *testing.T) {
 	    will_message = "msg"
 	    will_topic = "willtopic"
 `
-	ok := genericWillTestDriver(t, iniStr, "/willtopic", []byte("msg"))
+	ok := genericWillTestDriver(t, configStr, "/willtopic", []byte("msg"))
 	if !ok {
 		t.Error("Failed to receive Empty Will message")
 	}
 }
 
 func TestWillSubscribePublishWillWithNestedWillTopic(t *testing.T) {
-	iniStr := `
+	configStr := `
 	[gateway]
 	    name = "with"
 	[[broker."local/1"]]
@@ -157,7 +157,7 @@ func TestWillSubscribePublishWillWithNestedWillTopic(t *testing.T) {
 	    will_message = "msg"
 	    will_topic = "willtopic/nested"
 `
-	ok := genericWillTestDriver(t, iniStr, "/willtopic/nested", []byte("msg"))
+	ok := genericWillTestDriver(t, configStr, "/willtopic/nested", []byte("msg"))
 	if !ok {
 		t.Error("Failed to receive Empty Will message")
 	}
@@ -170,10 +170,10 @@ func TestWillSubscribePublishWillWithNestedWillTopic(t *testing.T) {
 // 4. force disconnect
 // 5. check subscriber receives will message
 
-func genericWillTestDriver(t *testing.T, iniStr string, expectedTopic string, expectedPayload []byte) (ok bool) {
+func genericWillTestDriver(t *testing.T, configStr string, expectedTopic string, expectedPayload []byte) (ok bool) {
 	assert := assert.New(t)
 
-	conf, err := config.LoadConfigByte([]byte(iniStr))
+	conf, err := config.LoadConfigByte([]byte(configStr))
 	assert.Nil(err)
 	commandChannel := make(chan string)
 	go fuji.StartByFileWithChannel(conf, commandChannel)

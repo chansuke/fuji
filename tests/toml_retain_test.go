@@ -26,11 +26,11 @@ import (
 )
 
 // iniRetainTestCase はRetain機能のテストの条件を示すデータ型です。
-// iniString は設定ファイルの内容
+// configString は設定ファイルの内容
 // expectedError はテストを実行したときに期待されるエラーの状態
 // message はテストが失敗した内容の説明
 type iniRetainTestCase struct {
-	iniStr        string
+	configStr     string
 	expectedError config.AnyError
 	message       string
 }
@@ -38,7 +38,7 @@ type iniRetainTestCase struct {
 var serialDeviceTestcases = []iniRetainTestCase{
 	// check device validation without retain flag
 	{
-		iniStr: `
+		configStr: `
 		[[broker."sango/1"]]
 		host = "localhost"
 		port = 1883
@@ -53,7 +53,7 @@ var serialDeviceTestcases = []iniRetainTestCase{
 		message:       "Retain flag could not be omitted. Shall be optional."},
 	// check device validation with retain flag
 	{
-		iniStr: `
+		configStr: `
 		[[broker."sango/1"]]
 		host = "localhost"
 		port = 1883
@@ -69,7 +69,7 @@ var serialDeviceTestcases = []iniRetainTestCase{
 		message:       "Retain flag could not be set."},
 	// check device validation with retain flag is false
 	{
-		iniStr: `
+		configStr: `
 		[[broker."sango/1"]]
 		host = "localhost"
 		port = 1883
@@ -88,7 +88,7 @@ var serialDeviceTestcases = []iniRetainTestCase{
 var dummyDeviceTestcases = []iniRetainTestCase{
 	// check device validation without retain flag
 	{
-		iniStr: `
+		configStr: `
 		[[broker."sango/1"]]
 		host = "localhost"
 		port = 1883
@@ -103,7 +103,7 @@ var dummyDeviceTestcases = []iniRetainTestCase{
 		message:       "Retain flag could not be omitted. Shall be optional."},
 	// check device validation with retain flag
 	{
-		iniStr: `
+		configStr: `
 		[[broker."sango/1"]]
 		host = "localhost"
 		port = 1883
@@ -119,7 +119,7 @@ var dummyDeviceTestcases = []iniRetainTestCase{
 		message:       "Retain flag could not be set."},
 	// check device validation with retain flag is false
 	{
-		iniStr: `
+		configStr: `
 		[[broker."sango/1"]]
 		host = "localhost"
 		port = 1883
@@ -139,7 +139,7 @@ var dummyDeviceTestcases = []iniRetainTestCase{
 func generalIniRetainSerialDeviceTest(test iniRetainTestCase, t *testing.T) {
 	assert := assert.New(t)
 
-	conf, err := config.LoadConfigByte([]byte(test.iniStr))
+	conf, err := config.LoadConfigByte([]byte(test.configStr))
 	assert.Nil(err)
 
 	brokers, err := broker.NewBrokers(conf, make(chan message.Message))
@@ -154,7 +154,7 @@ func generalIniRetainSerialDeviceTest(test iniRetainTestCase, t *testing.T) {
 func generalIniRetainDummyDeviceTest(test iniRetainTestCase, t *testing.T) {
 	assert := assert.New(t)
 
-	conf, err := config.LoadConfigByte([]byte(test.iniStr))
+	conf, err := config.LoadConfigByte([]byte(test.configStr))
 	assert.Nil(err)
 
 	brokers, err := broker.NewBrokers(conf, make(chan message.Message))

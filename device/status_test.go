@@ -39,7 +39,7 @@ func TestParseStatus(t *testing.T) {
 func TestStatus(t *testing.T) {
 	assert := assert.New(t)
 
-	iniStr := `
+	configStr := `
 [[broker."sango"]]
   host = "192.168.1.20"
   port = 1033
@@ -51,7 +51,7 @@ func TestStatus(t *testing.T) {
   broker = "sango"
   interval = 10
 `
-	conf, err := config.LoadConfigByte([]byte(iniStr))
+	conf, err := config.LoadConfigByte([]byte(configStr))
 	assert.Nil(err)
 	tt, err := NewStatus(conf)
 	assert.Nil(err)

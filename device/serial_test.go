@@ -26,7 +26,7 @@ import (
 func TestNewSerialDevice(t *testing.T) {
 	assert := assert.New(t)
 
-	iniStr := `
+	configStr := `
 [[device."dora/serial"]]
     broker = "sango"
     qos = 1
@@ -35,7 +35,7 @@ func TestNewSerialDevice(t *testing.T) {
     size = 4
     type = "BLE"
 `
-	conf, err := config.LoadConfigByte([]byte(iniStr))
+	conf, err := config.LoadConfigByte([]byte(configStr))
 	b1 := &broker.Broker{Name: "sango"}
 	brokers := []*broker.Broker{b1}
 	b, err := NewSerialDevice(conf.Sections[0], brokers, NewDeviceChannel())
@@ -50,7 +50,7 @@ func TestNewSerialDevice(t *testing.T) {
 func TestNewSerialDeviceNotSetSize(t *testing.T) {
 	assert := assert.New(t)
 
-	iniStr := `
+	configStr := `
 [[device."dora/serial"]]
     broker = "sango"
     qos = 1
@@ -58,7 +58,7 @@ func TestNewSerialDeviceNotSetSize(t *testing.T) {
     baud = 9600
     type = "BLE"
 `
-	conf, err := config.LoadConfigByte([]byte(iniStr))
+	conf, err := config.LoadConfigByte([]byte(configStr))
 	b1 := &broker.Broker{Name: "sango"}
 	brokers := []*broker.Broker{b1}
 	b, err := NewSerialDevice(conf.Sections[0], brokers, NewDeviceChannel())
@@ -72,13 +72,13 @@ func TestNewSerialDeviceNotSetSize(t *testing.T) {
 func TestNewSerialDeviceInvalidInterval(t *testing.T) {
 	assert := assert.New(t)
 
-	iniStr := `
+	configStr := `
 [[device."dora/serial"]]
     broker = "sango"
     interval = -1
     qos = 1
 `
-	conf, err := config.LoadConfigByte([]byte(iniStr))
+	conf, err := config.LoadConfigByte([]byte(configStr))
 	b1 := &broker.Broker{Name: "sango"}
 	brokers := []*broker.Broker{b1}
 	_, err = NewSerialDevice(conf.Sections[0], brokers, NewDeviceChannel())
@@ -88,12 +88,12 @@ func TestNewSerialDeviceInvalidInterval(t *testing.T) {
 func TestNewSerialDeviceInvalidQoS(t *testing.T) {
 	assert := assert.New(t)
 
-	iniStr := `
+	configStr := `
 [[device."dora/serial"]]
     broker = "sango"
     qos = -1
 `
-	conf, err := config.LoadConfigByte([]byte(iniStr))
+	conf, err := config.LoadConfigByte([]byte(configStr))
 	b1 := &broker.Broker{Name: "sango"}
 	brokers := []*broker.Broker{b1}
 	_, err = NewSerialDevice(conf.Sections[0], brokers, NewDeviceChannel())
@@ -103,12 +103,12 @@ func TestNewSerialDeviceInvalidQoS(t *testing.T) {
 func TestNewSerialDeviceInvalidBroker(t *testing.T) {
 	assert := assert.New(t)
 
-	iniStr := `
+	configStr := `
 [[device."dora/serial"]]
     broker = "doesNotExist"
     qos = 1
 `
-	conf, err := config.LoadConfigByte([]byte(iniStr))
+	conf, err := config.LoadConfigByte([]byte(configStr))
 	b1 := &broker.Broker{Name: "sango"}
 	brokers := []*broker.Broker{b1}
 	_, err = NewSerialDevice(conf.Sections[0], brokers, NewDeviceChannel())
@@ -118,13 +118,13 @@ func TestNewSerialDeviceInvalidBroker(t *testing.T) {
 func TestNewSerialDeviceInvalidBaud(t *testing.T) {
 	assert := assert.New(t)
 
-	iniStr := `
+	configStr := `
 [[device."dora/serial"]]
     broker = "sango"
     qos = -1
     baud = -9600
 `
-	conf, err := config.LoadConfigByte([]byte(iniStr))
+	conf, err := config.LoadConfigByte([]byte(configStr))
 	b1 := &broker.Broker{Name: "sango"}
 	brokers := []*broker.Broker{b1}
 	_, err = NewSerialDevice(conf.Sections[0], brokers, NewDeviceChannel())

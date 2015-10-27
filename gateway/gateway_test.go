@@ -39,37 +39,37 @@ func TestNewGatewayInvalidName(t *testing.T) {
 	assert := assert.New(t)
 
 	{ // includes plus
-		iniStr := `
+		configStr := `
 [gateway]
 name = "bone+lessham"
 `
-		conf, err := config.LoadConfigByte([]byte(iniStr))
+		conf, err := config.LoadConfigByte([]byte(configStr))
 		_, err = NewGateway(conf)
 		assert.NotNil(err)
 	}
 	{ // includes sharp
-		iniStr := `
+		configStr := `
 [gateway]
 name = ` + "`" + `bone\#lessham`
-		conf, err := config.LoadConfigByte([]byte(iniStr))
+		conf, err := config.LoadConfigByte([]byte(configStr))
 		_, err = NewGateway(conf)
 		assert.NotNil(err)
 	}
 	{ // too long
-		iniStr := `
+		configStr := `
 [gateway]
 name = "bonelesshaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 `
-		conf, err := config.LoadConfigByte([]byte(iniStr))
+		conf, err := config.LoadConfigByte([]byte(configStr))
 		_, err = NewGateway(conf)
 		assert.NotNil(err)
 	}
 	{ // \\U0000 string
-		iniStr := fmt.Sprintf(`
+		configStr := fmt.Sprintf(`
 [gateway]
 name = 	"na%cme"
 `, '\u0000')
-		conf, err := config.LoadConfigByte([]byte(iniStr))
+		conf, err := config.LoadConfigByte([]byte(configStr))
 		_, err = NewGateway(conf)
 		assert.NotNil(err)
 	}
@@ -79,43 +79,43 @@ func TestNewGatewayMaxRetryCount(t *testing.T) {
 	assert := assert.New(t)
 
 	{ // default
-		iniStr := `
+		configStr := `
 [gateway]
 name = "sango"
 `
-		conf, err := config.LoadConfigByte([]byte(iniStr))
+		conf, err := config.LoadConfigByte([]byte(configStr))
 		gw, err := NewGateway(conf)
 		assert.Nil(err)
 		assert.Equal(3, gw.MaxRetryCount)
 	}
 	{ // specified
-		iniStr := `
+		configStr := `
 [gateway]
 name = "sango"
 max_retry_count = 10
 `
-		conf, err := config.LoadConfigByte([]byte(iniStr))
+		conf, err := config.LoadConfigByte([]byte(configStr))
 		gw, err := NewGateway(conf)
 		assert.Nil(err)
 		assert.Equal(10, gw.MaxRetryCount)
 	}
 	{ // minus fail validation
-		iniStr := `
+		configStr := `
 [gateway]
 name = "sango"
 max_retry_count = -10
 `
-		conf, err := config.LoadConfigByte([]byte(iniStr))
+		conf, err := config.LoadConfigByte([]byte(configStr))
 		_, err = NewGateway(conf)
 		assert.NotNil(err)
 	}
 	{ // invalid int
-		iniStr := `
+		configStr := `
 [gateway]
 name = "sango"
 max_retry_count = aabbcc
 `
-		conf, err := config.LoadConfigByte([]byte(iniStr))
+		conf, err := config.LoadConfigByte([]byte(configStr))
 		_, err = NewGateway(conf)
 		assert.NotNil(err)
 	}
@@ -125,43 +125,43 @@ func TestNewGatewayRetryInterval(t *testing.T) {
 	assert := assert.New(t)
 
 	{ // default
-		iniStr := `
+		configStr := `
 [gateway]
 name = "sango"
 `
-		conf, err := config.LoadConfigByte([]byte(iniStr))
+		conf, err := config.LoadConfigByte([]byte(configStr))
 		gw, err := NewGateway(conf)
 		assert.Nil(err)
 		assert.Equal(3, gw.RetryInterval)
 	}
 	{ // specified
-		iniStr := `
+		configStr := `
 [gateway]
 name = "sango"
 retry_interval = 10
 `
-		conf, err := config.LoadConfigByte([]byte(iniStr))
+		conf, err := config.LoadConfigByte([]byte(configStr))
 		gw, err := NewGateway(conf)
 		assert.Nil(err)
 		assert.Equal(10, gw.RetryInterval)
 	}
 	{ // minus fail validation
-		iniStr := `
+		configStr := `
 [gateway]
 name = "sango"
 retry_interval = -10
 `
-		conf, err := config.LoadConfigByte([]byte(iniStr))
+		conf, err := config.LoadConfigByte([]byte(configStr))
 		_, err = NewGateway(conf)
 		assert.NotNil(err)
 	}
 	{ // invalid int
-		iniStr := `
+		configStr := `
 [gateway]
 name = "sango"
 retry_interval = aabbcc
 `
-		conf, err := config.LoadConfigByte([]byte(iniStr))
+		conf, err := config.LoadConfigByte([]byte(configStr))
 		_, err = NewGateway(conf)
 		assert.NotNil(err)
 	}

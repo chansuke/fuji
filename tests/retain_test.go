@@ -34,7 +34,7 @@ import (
 // 2. send data with retaind flag dummy device normaly
 func TestRetainJustPublish(t *testing.T) {
 	assert := assert.New(t)
-	iniStr := `
+	configStr := `
 	[gateway]
 	
 	    name = "retainham"
@@ -55,7 +55,7 @@ func TestRetainJustPublish(t *testing.T) {
 	    type = "EnOcean"
 	    retain = true
 `
-	conf, err := config.LoadConfigByte([]byte(iniStr))
+	conf, err := config.LoadConfigByte([]byte(configStr))
 	assert.Nil(err)
 	commandChannel := make(chan string)
 	go fuji.StartByFileWithChannel(conf, commandChannel)
@@ -71,7 +71,7 @@ func TestRetainJustPublish(t *testing.T) {
 // 5. subscirbe and receive data
 func TestRetainSubscribePublishClose(t *testing.T) {
 	assert := assert.New(t)
-	iniStr := `
+	configStr := `
 	[gateway]
 	
 	    name = "testRetainafterclose"
@@ -93,7 +93,7 @@ func TestRetainSubscribePublishClose(t *testing.T) {
 	    retain = true
 `
 	commandChannel := make(chan string)
-	conf, err := config.LoadConfigByte([]byte(iniStr))
+	conf, err := config.LoadConfigByte([]byte(configStr))
 	assert.Nil(err)
 	go fuji.StartByFileWithChannel(conf, commandChannel)
 

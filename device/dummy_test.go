@@ -26,7 +26,7 @@ import (
 func TestNewDummyDevice(t *testing.T) {
 	assert := assert.New(t)
 
-	iniStr := `
+	configStr := `
 [[device."dora/dummy"]]
     broker = "sango"
     qos = 1
@@ -34,7 +34,7 @@ func TestNewDummyDevice(t *testing.T) {
     interval = 10
     payload = "Hello world."
 `
-	conf, err := config.LoadConfigByte([]byte(iniStr))
+	conf, err := config.LoadConfigByte([]byte(configStr))
 	assert.Nil(err)
 	b1 := &broker.Broker{Name: "sango"}
 	brokers := []*broker.Broker{b1}
@@ -50,13 +50,13 @@ func TestNewDummyDevice(t *testing.T) {
 func TestNewDummyDeviceInvalidInterval(t *testing.T) {
 	assert := assert.New(t)
 
-	iniStr := `
+	configStr := `
 [[device."dora/dummy"]]
     broker = "sango"
     interval = -1
     qos = 1
 `
-	conf, err := config.LoadConfigByte([]byte(iniStr))
+	conf, err := config.LoadConfigByte([]byte(configStr))
 	assert.Nil(err)
 	b1 := &broker.Broker{Name: "sango"}
 	brokers := []*broker.Broker{b1}
@@ -67,13 +67,13 @@ func TestNewDummyDeviceInvalidInterval(t *testing.T) {
 func TestNewDummyDeviceInvalidQoS(t *testing.T) {
 	assert := assert.New(t)
 
-	iniStr := `
+	configStr := `
 [[device."dora/dummy"]]
     broker = "sango"
     interval = -1
     qos = -1
 `
-	conf, err := config.LoadConfigByte([]byte(iniStr))
+	conf, err := config.LoadConfigByte([]byte(configStr))
 	assert.Nil(err)
 	b1 := &broker.Broker{Name: "sango"}
 	brokers := []*broker.Broker{b1}
@@ -84,13 +84,13 @@ func TestNewDummyDeviceInvalidQoS(t *testing.T) {
 func TestNewDummyDeviceInvalidBroker(t *testing.T) {
 	assert := assert.New(t)
 
-	iniStr := `
+	configStr := `
 [[device."dora/dummy"]]
     broker = "doesNotExist"
     interval = 10
     qos = 1
 `
-	conf, err := config.LoadConfigByte([]byte(iniStr))
+	conf, err := config.LoadConfigByte([]byte(configStr))
 	assert.Nil(err)
 	b1 := &broker.Broker{Name: "sango"}
 	brokers := []*broker.Broker{b1}

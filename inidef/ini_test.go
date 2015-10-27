@@ -23,7 +23,7 @@ import (
 func Test_LoadConfigByte(t *testing.T) {
 	assert := assert.New(t)
 
-	iniStr := `
+	configStr := `
 [status "cpu/1"]
   cpu_times = user, system, idle, nice, iowait, irq, softirq, guest
 [status "memory"]
@@ -33,7 +33,7 @@ func Test_LoadConfigByte(t *testing.T) {
   interval = 10
 `
 
-	ret, err := LoadConfigByte([]byte(iniStr))
+	ret, err := LoadConfigByte([]byte(configStr))
 	assert.Nil(err)
 	assert.Equal(4, len(ret.Sections)) // DEFAULT is created
 	s := ret.Sections[1]
