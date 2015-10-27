@@ -50,7 +50,7 @@ name = "bone+lessham"
 	{ // includes sharp
 		configStr := `
 [gateway]
-name = ` + "`" + `bone\#lessham`
+name = "bone#lessham"`
 		conf, err := config.LoadConfigByte([]byte(configStr))
 		_, err = NewGateway(conf)
 		assert.NotNil(err)
