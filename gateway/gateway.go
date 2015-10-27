@@ -27,9 +27,9 @@ import (
 	validator "gopkg.in/validator.v2"
 
 	"github.com/shiguredo/fuji/broker"
+	"github.com/shiguredo/fuji/config"
 	"github.com/shiguredo/fuji/device"
 	"github.com/shiguredo/fuji/message"
-	"github.com/shiguredo/fuji/toml"
 )
 
 type Gateway struct {
@@ -55,7 +55,7 @@ const (
 )
 
 func init() {
-	validator.SetValidationFunc("validtopic", toml.ValidMqttPublishTopic)
+	validator.SetValidationFunc("validtopic", config.ValidMqttPublishTopic)
 }
 
 func (gateway Gateway) String() string {
@@ -63,8 +63,8 @@ func (gateway Gateway) String() string {
 }
 
 // NewGateway returns Gateway instance with config object
-func NewGateway(conf toml.Config) (*Gateway, error) {
-	var section toml.ConfigSection
+func NewGateway(conf config.Config) (*Gateway, error) {
+	var section config.ConfigSection
 	for _, s := range conf.Sections {
 		if s.Type == "gateway" {
 			section = s

@@ -19,7 +19,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/shiguredo/fuji/toml"
+	"github.com/shiguredo/fuji/config"
 )
 
 func TestParseStatus(t *testing.T) {
@@ -51,7 +51,7 @@ func TestStatus(t *testing.T) {
   broker = "sango"
   interval = 10
 `
-	conf, err := toml.LoadConfigByte([]byte(iniStr))
+	conf, err := config.LoadConfigByte([]byte(iniStr))
 	assert.Nil(err)
 	tt, err := NewStatus(conf)
 	assert.Nil(err)

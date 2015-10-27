@@ -20,7 +20,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/shiguredo/fuji/broker"
-	"github.com/shiguredo/fuji/toml"
+	"github.com/shiguredo/fuji/config"
 )
 
 func TestNewDummyDevice(t *testing.T) {
@@ -34,7 +34,7 @@ func TestNewDummyDevice(t *testing.T) {
     interval = 10
     payload = "Hello world."
 `
-	conf, err := toml.LoadConfigByte([]byte(iniStr))
+	conf, err := config.LoadConfigByte([]byte(iniStr))
 	assert.Nil(err)
 	b1 := &broker.Broker{Name: "sango"}
 	brokers := []*broker.Broker{b1}
@@ -56,7 +56,7 @@ func TestNewDummyDeviceInvalidInterval(t *testing.T) {
     interval = -1
     qos = 1
 `
-	conf, err := toml.LoadConfigByte([]byte(iniStr))
+	conf, err := config.LoadConfigByte([]byte(iniStr))
 	assert.Nil(err)
 	b1 := &broker.Broker{Name: "sango"}
 	brokers := []*broker.Broker{b1}
@@ -73,7 +73,7 @@ func TestNewDummyDeviceInvalidQoS(t *testing.T) {
     interval = -1
     qos = -1
 `
-	conf, err := toml.LoadConfigByte([]byte(iniStr))
+	conf, err := config.LoadConfigByte([]byte(iniStr))
 	assert.Nil(err)
 	b1 := &broker.Broker{Name: "sango"}
 	brokers := []*broker.Broker{b1}
@@ -90,7 +90,7 @@ func TestNewDummyDeviceInvalidBroker(t *testing.T) {
     interval = 10
     qos = 1
 `
-	conf, err := toml.LoadConfigByte([]byte(iniStr))
+	conf, err := config.LoadConfigByte([]byte(iniStr))
 	assert.Nil(err)
 	b1 := &broker.Broker{Name: "sango"}
 	brokers := []*broker.Broker{b1}

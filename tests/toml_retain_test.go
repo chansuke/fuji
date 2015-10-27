@@ -20,9 +20,9 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/shiguredo/fuji/broker"
+	"github.com/shiguredo/fuji/config"
 	"github.com/shiguredo/fuji/device"
 	"github.com/shiguredo/fuji/message"
-	"github.com/shiguredo/fuji/toml"
 )
 
 // iniRetainTestCase はRetain機能のテストの条件を示すデータ型です。
@@ -31,7 +31,7 @@ import (
 // message はテストが失敗した内容の説明
 type iniRetainTestCase struct {
 	iniStr        string
-	expectedError toml.AnyError
+	expectedError config.AnyError
 	message       string
 }
 
@@ -139,7 +139,7 @@ var dummyDeviceTestcases = []iniRetainTestCase{
 func generalIniRetainSerialDeviceTest(test iniRetainTestCase, t *testing.T) {
 	assert := assert.New(t)
 
-	conf, err := toml.LoadConfigByte([]byte(test.iniStr))
+	conf, err := config.LoadConfigByte([]byte(test.iniStr))
 	assert.Nil(err)
 
 	brokers, err := broker.NewBrokers(conf, make(chan message.Message))
@@ -154,7 +154,7 @@ func generalIniRetainSerialDeviceTest(test iniRetainTestCase, t *testing.T) {
 func generalIniRetainDummyDeviceTest(test iniRetainTestCase, t *testing.T) {
 	assert := assert.New(t)
 
-	conf, err := toml.LoadConfigByte([]byte(test.iniStr))
+	conf, err := config.LoadConfigByte([]byte(test.iniStr))
 	assert.Nil(err)
 
 	brokers, err := broker.NewBrokers(conf, make(chan message.Message))

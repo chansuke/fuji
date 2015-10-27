@@ -24,8 +24,8 @@ import (
 
 	"github.com/shiguredo/fuji"
 	"github.com/shiguredo/fuji/broker"
+	"github.com/shiguredo/fuji/config"
 	"github.com/shiguredo/fuji/gateway"
-	"github.com/shiguredo/fuji/toml"
 )
 
 // TestWillJustPublish tests
@@ -49,7 +49,7 @@ func TestWillJustPublish(t *testing.T) {
 	    payload = "Hello will just publish world."
 	    type = "EnOcean"
 `
-	conf, err := toml.LoadConfigByte([]byte(iniStr))
+	conf, err := config.LoadConfigByte([]byte(iniStr))
 	assert.Nil(err)
 	commandChannel := make(chan string)
 	go fuji.StartByFileWithChannel(conf, commandChannel)
@@ -173,7 +173,7 @@ func TestWillSubscribePublishWillWithNestedWillTopic(t *testing.T) {
 func genericWillTestDriver(t *testing.T, iniStr string, expectedTopic string, expectedPayload []byte) (ok bool) {
 	assert := assert.New(t)
 
-	conf, err := toml.LoadConfigByte([]byte(iniStr))
+	conf, err := config.LoadConfigByte([]byte(iniStr))
 	assert.Nil(err)
 	commandChannel := make(chan string)
 	go fuji.StartByFileWithChannel(conf, commandChannel)
@@ -188,7 +188,7 @@ func genericWillTestDriver(t *testing.T, iniStr string, expectedTopic string, ex
 		time.Sleep(1 * time.Second)
 
 		subscriberChannel, err := setupWillSubscriber(gw, brokers[0])
-		if err != toml.Error("") {
+		if err != config.Error("") {
 			t.Error(err)
 		}
 
@@ -211,7 +211,7 @@ func genericWillTestDriver(t *testing.T, iniStr string, expectedTopic string, ex
 }
 
 // setupWillSubscriber start subscriber process and returnes a channel witch can receive will message.
-func setupWillSubscriber(gw *gateway.Gateway, broker *broker.Broker) (chan MQTT.Message, toml.Error) {
+func setupWillSubscriber(gw *gateway.Gateway, broker *broker.Broker) (chan MQTT.Message, config.Error) {
 	// Setup MQTT pub/sub client to confirm published content.
 	//
 	messageOutputChannel := make(chan MQTT.Message)
@@ -227,10 +227,10 @@ func setupWillSubscriber(gw *gateway.Gateway, broker *broker.Broker) (chan MQTT.
 
 	client := MQTT.NewClient(opts)
 	if client == nil {
-		return nil, toml.Error("NewClient failed")
+		return nil, config.Error("NewClient failed")
 	}
 	if token := client.Connect(); token.Wait() && token.Error() != nil {
-		return nil, toml.Error(fmt.Sprintf("NewClient Start failed %q", token.Error()))
+		return nil, config.Error(fmt.Sprintf("NewClient Start failed %q", token.Error()))
 	}
 
 	qos := 0
@@ -240,5 +240,5 @@ func setupWillSubscriber(gw *gateway.Gateway, broker *broker.Broker) (chan MQTT.
 		messageOutputChannel <- msg
 	})
 
-	return messageOutputChannel, toml.Error("")
+	return messageOutputChannel, config.Error("")
 }

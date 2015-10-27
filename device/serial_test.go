@@ -20,7 +20,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/shiguredo/fuji/broker"
-	"github.com/shiguredo/fuji/toml"
+	"github.com/shiguredo/fuji/config"
 )
 
 func TestNewSerialDevice(t *testing.T) {
@@ -35,7 +35,7 @@ func TestNewSerialDevice(t *testing.T) {
     size = 4
     type = "BLE"
 `
-	conf, err := toml.LoadConfigByte([]byte(iniStr))
+	conf, err := config.LoadConfigByte([]byte(iniStr))
 	b1 := &broker.Broker{Name: "sango"}
 	brokers := []*broker.Broker{b1}
 	b, err := NewSerialDevice(conf.Sections[0], brokers, NewDeviceChannel())
@@ -58,7 +58,7 @@ func TestNewSerialDeviceNotSetSize(t *testing.T) {
     baud = 9600
     type = "BLE"
 `
-	conf, err := toml.LoadConfigByte([]byte(iniStr))
+	conf, err := config.LoadConfigByte([]byte(iniStr))
 	b1 := &broker.Broker{Name: "sango"}
 	brokers := []*broker.Broker{b1}
 	b, err := NewSerialDevice(conf.Sections[0], brokers, NewDeviceChannel())
@@ -78,7 +78,7 @@ func TestNewSerialDeviceInvalidInterval(t *testing.T) {
     interval = -1
     qos = 1
 `
-	conf, err := toml.LoadConfigByte([]byte(iniStr))
+	conf, err := config.LoadConfigByte([]byte(iniStr))
 	b1 := &broker.Broker{Name: "sango"}
 	brokers := []*broker.Broker{b1}
 	_, err = NewSerialDevice(conf.Sections[0], brokers, NewDeviceChannel())
@@ -93,7 +93,7 @@ func TestNewSerialDeviceInvalidQoS(t *testing.T) {
     broker = "sango"
     qos = -1
 `
-	conf, err := toml.LoadConfigByte([]byte(iniStr))
+	conf, err := config.LoadConfigByte([]byte(iniStr))
 	b1 := &broker.Broker{Name: "sango"}
 	brokers := []*broker.Broker{b1}
 	_, err = NewSerialDevice(conf.Sections[0], brokers, NewDeviceChannel())
@@ -108,7 +108,7 @@ func TestNewSerialDeviceInvalidBroker(t *testing.T) {
     broker = "doesNotExist"
     qos = 1
 `
-	conf, err := toml.LoadConfigByte([]byte(iniStr))
+	conf, err := config.LoadConfigByte([]byte(iniStr))
 	b1 := &broker.Broker{Name: "sango"}
 	brokers := []*broker.Broker{b1}
 	_, err = NewSerialDevice(conf.Sections[0], brokers, NewDeviceChannel())
@@ -124,7 +124,7 @@ func TestNewSerialDeviceInvalidBaud(t *testing.T) {
     qos = -1
     baud = -9600
 `
-	conf, err := toml.LoadConfigByte([]byte(iniStr))
+	conf, err := config.LoadConfigByte([]byte(iniStr))
 	b1 := &broker.Broker{Name: "sango"}
 	brokers := []*broker.Broker{b1}
 	_, err = NewSerialDevice(conf.Sections[0], brokers, NewDeviceChannel())

@@ -21,12 +21,12 @@ import (
 
 	validator "gopkg.in/validator.v2"
 
-	"github.com/shiguredo/fuji/toml"
+	"github.com/shiguredo/fuji/config"
 )
 
 // init is automatically invoked at initial time.
 func init() {
-	validator.SetValidationFunc("validtopic", toml.ValidMqttPublishTopic)
+	validator.SetValidationFunc("validtopic", config.ValidMqttPublishTopic)
 }
 
 // TopicString is an type which is represents MQTT Topic string.
@@ -48,11 +48,11 @@ func (topic TopicString) Validate() error {
 		return errors.New("not a valid UTF8 string")
 	}
 
-	if toml.ReU0.FindString(topic.Str) != "" {
+	if config.ReU0.FindString(topic.Str) != "" {
 		return errors.New("topic should NOT include \\U0000 character")
 	}
 
-	if toml.ReWild.FindString(topic.Str) != "" {
+	if config.ReWild.FindString(topic.Str) != "" {
 		return errors.New("should not MQTT pub-topic include wildard character")
 	}
 	return nil

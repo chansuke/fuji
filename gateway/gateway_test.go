@@ -20,13 +20,13 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/shiguredo/fuji/toml"
+	"github.com/shiguredo/fuji/config"
 )
 
 func TestNewGateway(t *testing.T) {
 	assert := assert.New(t)
 
-	conf, err := toml.LoadConfig("../tests/testing_conf.toml")
+	conf, err := config.LoadConfig("../tests/testing_conf.toml")
 	gw, err := NewGateway(conf)
 	assert.Nil(err)
 	assert.Equal("ham", gw.Name)
@@ -43,7 +43,7 @@ func TestNewGatewayInvalidName(t *testing.T) {
 [gateway]
 name = "bone+lessham"
 `
-		conf, err := toml.LoadConfigByte([]byte(iniStr))
+		conf, err := config.LoadConfigByte([]byte(iniStr))
 		_, err = NewGateway(conf)
 		assert.NotNil(err)
 	}
@@ -51,7 +51,7 @@ name = "bone+lessham"
 		iniStr := `
 [gateway]
 name = ` + "`" + `bone\#lessham`
-		conf, err := toml.LoadConfigByte([]byte(iniStr))
+		conf, err := config.LoadConfigByte([]byte(iniStr))
 		_, err = NewGateway(conf)
 		assert.NotNil(err)
 	}
@@ -60,7 +60,7 @@ name = ` + "`" + `bone\#lessham`
 [gateway]
 name = "bonelesshaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 `
-		conf, err := toml.LoadConfigByte([]byte(iniStr))
+		conf, err := config.LoadConfigByte([]byte(iniStr))
 		_, err = NewGateway(conf)
 		assert.NotNil(err)
 	}
@@ -69,7 +69,7 @@ name = "bonelesshaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 [gateway]
 name = 	"na%cme"
 `, '\u0000')
-		conf, err := toml.LoadConfigByte([]byte(iniStr))
+		conf, err := config.LoadConfigByte([]byte(iniStr))
 		_, err = NewGateway(conf)
 		assert.NotNil(err)
 	}
@@ -83,7 +83,7 @@ func TestNewGatewayMaxRetryCount(t *testing.T) {
 [gateway]
 name = "sango"
 `
-		conf, err := toml.LoadConfigByte([]byte(iniStr))
+		conf, err := config.LoadConfigByte([]byte(iniStr))
 		gw, err := NewGateway(conf)
 		assert.Nil(err)
 		assert.Equal(3, gw.MaxRetryCount)
@@ -94,7 +94,7 @@ name = "sango"
 name = "sango"
 max_retry_count = 10
 `
-		conf, err := toml.LoadConfigByte([]byte(iniStr))
+		conf, err := config.LoadConfigByte([]byte(iniStr))
 		gw, err := NewGateway(conf)
 		assert.Nil(err)
 		assert.Equal(10, gw.MaxRetryCount)
@@ -105,7 +105,7 @@ max_retry_count = 10
 name = "sango"
 max_retry_count = -10
 `
-		conf, err := toml.LoadConfigByte([]byte(iniStr))
+		conf, err := config.LoadConfigByte([]byte(iniStr))
 		_, err = NewGateway(conf)
 		assert.NotNil(err)
 	}
@@ -115,7 +115,7 @@ max_retry_count = -10
 name = "sango"
 max_retry_count = aabbcc
 `
-		conf, err := toml.LoadConfigByte([]byte(iniStr))
+		conf, err := config.LoadConfigByte([]byte(iniStr))
 		_, err = NewGateway(conf)
 		assert.NotNil(err)
 	}
@@ -129,7 +129,7 @@ func TestNewGatewayRetryInterval(t *testing.T) {
 [gateway]
 name = "sango"
 `
-		conf, err := toml.LoadConfigByte([]byte(iniStr))
+		conf, err := config.LoadConfigByte([]byte(iniStr))
 		gw, err := NewGateway(conf)
 		assert.Nil(err)
 		assert.Equal(3, gw.RetryInterval)
@@ -140,7 +140,7 @@ name = "sango"
 name = "sango"
 retry_interval = 10
 `
-		conf, err := toml.LoadConfigByte([]byte(iniStr))
+		conf, err := config.LoadConfigByte([]byte(iniStr))
 		gw, err := NewGateway(conf)
 		assert.Nil(err)
 		assert.Equal(10, gw.RetryInterval)
@@ -151,7 +151,7 @@ retry_interval = 10
 name = "sango"
 retry_interval = -10
 `
-		conf, err := toml.LoadConfigByte([]byte(iniStr))
+		conf, err := config.LoadConfigByte([]byte(iniStr))
 		_, err = NewGateway(conf)
 		assert.NotNil(err)
 	}
@@ -161,7 +161,7 @@ retry_interval = -10
 name = "sango"
 retry_interval = aabbcc
 `
-		conf, err := toml.LoadConfigByte([]byte(iniStr))
+		conf, err := config.LoadConfigByte([]byte(iniStr))
 		_, err = NewGateway(conf)
 		assert.NotNil(err)
 	}

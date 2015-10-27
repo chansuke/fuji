@@ -20,23 +20,23 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/shiguredo/fuji/broker"
+	"github.com/shiguredo/fuji/config"
 	"github.com/shiguredo/fuji/device"
 	"github.com/shiguredo/fuji/gateway"
 	"github.com/shiguredo/fuji/message"
-	"github.com/shiguredo/fuji/toml"
 )
 
 func TestIniLoadini(t *testing.T) {
 	assert := assert.New(t)
 
-	_, err := toml.LoadConfig("testing_conf.toml")
+	_, err := config.LoadConfig("testing_conf.toml")
 	assert.Nil(err)
 }
 
 func TestIniNewGateway(t *testing.T) {
 	assert := assert.New(t)
 
-	conf, err := toml.LoadConfig("testing_conf.toml")
+	conf, err := config.LoadConfig("testing_conf.toml")
 	assert.Nil(err)
 	gw, err := gateway.NewGateway(conf)
 	assert.Nil(err)
@@ -46,7 +46,7 @@ func TestIniNewGateway(t *testing.T) {
 func TestIniNewBrokers(t *testing.T) {
 	assert := assert.New(t)
 
-	conf, err := toml.LoadConfig("testing_conf.toml")
+	conf, err := config.LoadConfig("testing_conf.toml")
 	assert.Nil(err)
 	brokerList, err := broker.NewBrokers(conf, make(chan message.Message))
 	assert.Nil(err)
@@ -56,7 +56,7 @@ func TestIniNewBrokers(t *testing.T) {
 func TestIniNewSerialDevices(t *testing.T) {
 	assert := assert.New(t)
 
-	conf, err := toml.LoadConfig("testing_conf.toml")
+	conf, err := config.LoadConfig("testing_conf.toml")
 	brokerList, err := broker.NewBrokers(conf, make(chan message.Message))
 	assert.Nil(err)
 	deviceList, _, err := device.NewDevices(conf, brokerList)
@@ -67,7 +67,7 @@ func TestIniNewSerialDevices(t *testing.T) {
 func TestIniNewDummyDevice(t *testing.T) {
 	assert := assert.New(t)
 
-	conf, err := toml.LoadConfig("testing_conf.toml")
+	conf, err := config.LoadConfig("testing_conf.toml")
 	brokerList, err := broker.NewBrokers(conf, make(chan message.Message))
 	assert.Nil(err)
 

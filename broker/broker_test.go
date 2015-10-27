@@ -20,8 +20,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/shiguredo/fuji/config"
 	"github.com/shiguredo/fuji/message"
-	"github.com/shiguredo/fuji/toml"
 )
 
 /*
@@ -33,7 +33,7 @@ func TestNewBrokersSingle(t *testing.T) {
     host = "192.168.1.22"
     port = 1883
 `
-	conf, err := toml.LoadConfigByte([]byte(iniStr))
+	conf, err := config.LoadConfigByte([]byte(iniStr))
 	b, err := NewBrokers(conf, make(chan message.Message))
 	assert.Nil(err)
 	assert.Equal(1, len(b))
@@ -55,7 +55,7 @@ func TestNewBrokersSettings(t *testing.T) {
     topic_prefix = "pre"
     will_message = "will"
 `
-	conf, err := toml.LoadConfigByte([]byte(iniStr))
+	conf, err := config.LoadConfigByte([]byte(iniStr))
 	b, err := NewBrokers(conf, make(chan message.Message))
 	assert.Nil(err)
 	assert.Equal(1, len(b))
@@ -76,7 +76,7 @@ func TestNewBrokersMulti(t *testing.T) {
     host = "192.168.1.22"
     port = 1883
 `
-	conf, err := toml.LoadConfigByte([]byte(iniStr))
+	conf, err := config.LoadConfigByte([]byte(iniStr))
 	b, err := NewBrokers(conf, make(chan message.Message))
 	assert.Nil(err)
 	assert.Equal(2, len(b))
@@ -94,7 +94,7 @@ func TestBrokerValidationHost(t *testing.T) {
     host = "192.168.1.22aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
     port = 1883
 `
-	conf, err := toml.LoadConfigByte([]byte(iniStr))
+	conf, err := config.LoadConfigByte([]byte(iniStr))
 	_, err = NewBrokers(conf, make(chan message.Message))
 	assert.NotNil(err)
 }
@@ -106,7 +106,7 @@ func TestBrokerValidationPort(t *testing.T) {
     host = "192.168.1.22"
     port = 65536
 `
-	conf, err := toml.LoadConfigByte([]byte(iniStr))
+	conf, err := config.LoadConfigByte([]byte(iniStr))
 	_, err = NewBrokers(conf, make(chan message.Message))
 	assert.NotNil(err)
 }
@@ -118,7 +118,7 @@ func TestBrokerValidationPriority(t *testing.T) {
     host = "192.168.1.22"
     port = 1883
 `
-	conf, err := toml.LoadConfigByte([]byte(iniStr))
+	conf, err := config.LoadConfigByte([]byte(iniStr))
 	_, err = NewBrokers(conf, make(chan message.Message))
 	assert.NotNil(err)
 
@@ -127,7 +127,7 @@ func TestBrokerValidationPriority(t *testing.T) {
     host = "192.168.1.22"
     port = 1883
 `
-	conf, err = toml.LoadConfigByte([]byte(iniStr))
+	conf, err = config.LoadConfigByte([]byte(iniStr))
 	_, err = NewBrokers(conf, make(chan message.Message))
 	assert.NotNil(err)
 
@@ -141,7 +141,7 @@ func TestBrokerValidationWill(t *testing.T) {
     port = 1883
     will_message = "will"
 `
-	conf, err := toml.LoadConfigByte([]byte(iniStr))
+	conf, err := config.LoadConfigByte([]byte(iniStr))
 	b, err := NewBrokers(conf, make(chan message.Message))
 	assert.Nil(err)
 	assert.Equal(1, len(b))
@@ -153,7 +153,7 @@ func TestBrokerValidationWill(t *testing.T) {
     port = 1883
     will_message = "\\x01\\x0f"
 `
-	conf, err = toml.LoadConfigByte([]byte(iniStr))
+	conf, err = config.LoadConfigByte([]byte(iniStr))
 	b, err = NewBrokers(conf, make(chan message.Message))
 	assert.Nil(err)
 	assert.Equal(1, len(b))
@@ -166,7 +166,7 @@ func TestBrokerValidationWill(t *testing.T) {
     port = 1883
     will_message = "\\x01\\x0fffff"
 `
-	conf, err = toml.LoadConfigByte([]byte(iniStr))
+	conf, err = config.LoadConfigByte([]byte(iniStr))
 	b, err = NewBrokers(conf, make(chan message.Message))
 	assert.Nil(err)
 	assert.Equal(1, len(b))

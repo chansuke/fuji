@@ -20,14 +20,14 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/shiguredo/fuji/broker"
+	"github.com/shiguredo/fuji/config"
 	"github.com/shiguredo/fuji/message"
-	"github.com/shiguredo/fuji/toml"
 )
 
 type iniWillTestCase struct {
-	iniStr        string        // testcase config file
-	expectedError toml.AnyError // expected error status
-	message       string        // message when failed
+	iniStr        string          // testcase config file
+	expectedError config.AnyError // expected error status
+	message       string          // message when failed
 }
 
 var testcases = []iniWillTestCase{
@@ -101,7 +101,7 @@ var testcases = []iniWillTestCase{
 func generalIniWillTest(test iniWillTestCase, t *testing.T) {
 	assert := assert.New(t)
 
-	conf, err := toml.LoadConfigByte([]byte(test.iniStr))
+	conf, err := config.LoadConfigByte([]byte(test.iniStr))
 	assert.Nil(err)
 
 	brokers, err := broker.NewBrokers(conf, make(chan message.Message))

@@ -24,9 +24,9 @@ import (
 
 	"github.com/shiguredo/fuji"
 	"github.com/shiguredo/fuji/broker"
+	"github.com/shiguredo/fuji/config"
 	"github.com/shiguredo/fuji/device"
 	"github.com/shiguredo/fuji/gateway"
-	"github.com/shiguredo/fuji/toml"
 )
 
 // publish test to broker on localhost
@@ -50,7 +50,7 @@ func TestConnectLocalPubSub(t *testing.T) {
 	// publised messages confirmed by subscriber
 
 	// get config
-	conf, err := toml.LoadConfig("connectlocalpubsub.toml")
+	conf, err := config.LoadConfig("connectlocalpubsub.toml")
 	assert.Nil(err)
 
 	// get Gateway

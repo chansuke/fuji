@@ -24,9 +24,9 @@ import (
 
 	"github.com/shiguredo/fuji"
 	"github.com/shiguredo/fuji/broker"
+	"github.com/shiguredo/fuji/config"
 	"github.com/shiguredo/fuji/device"
 	"github.com/shiguredo/fuji/gateway"
-	"github.com/shiguredo/fuji/toml"
 )
 
 // TestRetainJustPublish tests
@@ -55,7 +55,7 @@ func TestRetainJustPublish(t *testing.T) {
 	    type = "EnOcean"
 	    retain = true
 `
-	conf, err := toml.LoadConfigByte([]byte(iniStr))
+	conf, err := config.LoadConfigByte([]byte(iniStr))
 	assert.Nil(err)
 	commandChannel := make(chan string)
 	go fuji.StartByFileWithChannel(conf, commandChannel)
@@ -93,7 +93,7 @@ func TestRetainSubscribePublishClose(t *testing.T) {
 	    retain = true
 `
 	commandChannel := make(chan string)
-	conf, err := toml.LoadConfigByte([]byte(iniStr))
+	conf, err := config.LoadConfigByte([]byte(iniStr))
 	assert.Nil(err)
 	go fuji.StartByFileWithChannel(conf, commandChannel)
 
@@ -123,7 +123,7 @@ func TestRetainSubscribePublishClose(t *testing.T) {
 		time.Sleep(2 * time.Second)
 
 		subscriberChannel, err := setupRetainSubscriber(gw, brokerList[0], &dummyDevice)
-		if err != toml.Error("") {
+		if err != config.Error("") {
 			t.Error(err)
 		}
 		// check Retained message
@@ -141,7 +141,7 @@ func TestRetainSubscribePublishClose(t *testing.T) {
 }
 
 // setupRetainSubscriber returnes channel in order to read messages with retained flag
-func setupRetainSubscriber(gw *gateway.Gateway, broker *broker.Broker, dummyDevice *device.DummyDevice) (chan [2]string, toml.Error) {
+func setupRetainSubscriber(gw *gateway.Gateway, broker *broker.Broker, dummyDevice *device.DummyDevice) (chan [2]string, config.Error) {
 	// Setup MQTT pub/sub client to confirm published content.
 	//
 	messageOutputChannel := make(chan [2]string)
@@ -157,16 +157,16 @@ func setupRetainSubscriber(gw *gateway.Gateway, broker *broker.Broker, dummyDevi
 
 	client := MQTT.NewClient(opts)
 	if client == nil {
-		return nil, toml.Error("NewClient failed")
+		return nil, config.Error("NewClient failed")
 	}
 
 	if token := client.Connect(); token.Wait() && token.Error() != nil {
-		return nil, toml.Error(fmt.Sprintf("NewClient Start failed %q", token.Error()))
+		return nil, config.Error(fmt.Sprintf("NewClient Start failed %q", token.Error()))
 	}
 	qos := 0
 	retainedTopic := fmt.Sprintf("%s/%s/%s/%s", broker.TopicPrefix, gw.Name, dummyDevice.Name, dummyDevice.Type)
 	client.Subscribe(retainedTopic, byte(qos), func(client *MQTT.Client, msg MQTT.Message) {
 	})
 
-	return messageOutputChannel, toml.Error("")
+	return messageOutputChannel, config.Error("")
 }

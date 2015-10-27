@@ -24,8 +24,8 @@ import (
 	validator "gopkg.in/validator.v2"
 
 	"github.com/shiguredo/fuji/broker"
+	"github.com/shiguredo/fuji/config"
 	"github.com/shiguredo/fuji/message"
-	"github.com/shiguredo/fuji/toml"
 	"github.com/shiguredo/fuji/utils"
 )
 
@@ -50,7 +50,7 @@ func (dummyDevice *DummyDevice) String() string {
 }
 
 // NewDummyDevice creates dummy device which outputs specified string/binary payload.
-func NewDummyDevice(section toml.ConfigSection, brokers []*broker.Broker, devChan DeviceChannel) (DummyDevice, error) {
+func NewDummyDevice(section config.ConfigSection, brokers []*broker.Broker, devChan DeviceChannel) (DummyDevice, error) {
 	ret := DummyDevice{
 		Name:       section.Name,
 		DeviceChan: devChan,
@@ -107,7 +107,7 @@ func NewDummyDevice(section toml.ConfigSection, brokers []*broker.Broker, devCha
 
 func (device *DummyDevice) Validate() error {
 	validator := validator.NewValidator()
-	validator.SetValidationFunc("validtopic", toml.ValidMqttPublishTopic)
+	validator.SetValidationFunc("validtopic", config.ValidMqttPublishTopic)
 	if err := validator.Validate(device); err != nil {
 		return err
 	}
