@@ -90,6 +90,104 @@ func String(str NilOrString) string {
 	return stringValue
 }
 
+func getGatewayName(gatewaySectionMap SectionMap) string {
+	for name, value := range gatewaySectionMap {
+		if name == "name" {
+			gatewayName := value.(string)
+			return gatewayName
+		}
+	}
+	return ""
+}
+
+func addGatewaySection(configSections []ConfigSection, gatewaySectionMap SectionMap) []ConfigSection {
+	valueMap := make(ValueMap)
+	for name, value := range gatewaySectionMap {
+
+		switch value.(type) {
+		case int64:
+			valueMap[name] = strconv.FormatInt(value.(int64), 10)
+		case bool:
+			valueMap[name] = strconv.FormatBool(value.(bool))
+		default:
+			valueMap[name] = value.(string)
+		}
+
+	}
+
+	if len(valueMap) > 0 {
+		rt := ConfigSection{
+			Title:  "gateway",
+			Type:   "gateway",
+			Values: valueMap,
+		}
+		configSections = append(configSections, rt)
+	}
+
+	return configSections
+}
+
+func addStatusSections(configSections []ConfigSection, statusSectionMap SectionMap) []ConfigSection {
+	valueMap := make(ValueMap)
+	for name, value := range statusSectionMap {
+
+		switch value.(type) {
+		case int64:
+			valueMap[name] = strconv.FormatInt(value.(int64), 10)
+		case bool:
+			valueMap[name] = strconv.FormatBool(value.(bool))
+		case []map[string]interface{}:
+			// do nothing
+		default:
+			valueMap[name] = value.(string)
+		}
+
+	}
+	if len(valueMap) > 0 {
+		rt := ConfigSection{
+			Title:  "status",
+			Type:   "status",
+			Values: valueMap,
+		}
+		configSections = append(configSections, rt)
+	}
+
+	for name, value := range statusSectionMap {
+
+		valueMap := make(ValueMap)
+		switch value.(type) {
+		case []map[string]interface{}:
+			{
+				m := value.([]map[string]interface{})
+				for _, v := range m {
+					for k, vv := range v {
+						switch vv.(type) {
+						case int64:
+							valueMap[k] = strconv.FormatInt(vv.(int64), 10)
+						case bool:
+							valueMap[k] = strconv.FormatBool(vv.(bool))
+						default:
+							valueMap[k] = vv.(string)
+						}
+					}
+				}
+			}
+		}
+
+		if len(valueMap) > 0 {
+			rt := ConfigSection{
+				Title:  "status",
+				Type:   "status",
+				Name:   name,
+				Values: valueMap,
+			}
+			configSections = append(configSections, rt)
+		}
+	}
+
+	return configSections
+}
+
 func addConfigSections(configSections []ConfigSection, title string, sectionMap SectionMap) []ConfigSection {
 	for name, values := range sectionMap {
 		t := strings.Split(name, "/")
@@ -201,93 +299,14 @@ func LoadConfigByte(conf []byte) (Config, error) {
 	var bn []string
 
 	// gateway section
-	valueMap := make(ValueMap)
-	for name, value := range configToml.Gateway {
-
-		if name == "name" {
-			config.GatewayName = value.(string)
-			if config.GatewayName == "" {
-				return config, fmt.Errorf("gateway has not name")
-			}
-		}
-
-		switch value.(type) {
-		case int64:
-			valueMap[name] = strconv.FormatInt(value.(int64), 10)
-		case bool:
-			valueMap[name] = strconv.FormatBool(value.(bool))
-		default:
-			valueMap[name] = value.(string)
-		}
-
+	config.GatewayName = getGatewayName(configToml.Gateway)
+	if config.GatewayName == "" {
+		return config, fmt.Errorf("gateway has not name")
 	}
-
-	if len(valueMap) > 0 {
-		rt := ConfigSection{
-			Title:  "gateway",
-			Type:   "gateway",
-			Values: valueMap,
-		}
-		sections = append(sections, rt)
-	}
+	sections = addGatewaySection(sections, configToml.Gateway)
 
 	// status section
-	valueMap = make(ValueMap)
-	for name, value := range configToml.Status {
-
-		switch value.(type) {
-		case int64:
-			valueMap[name] = strconv.FormatInt(value.(int64), 10)
-		case bool:
-			valueMap[name] = strconv.FormatBool(value.(bool))
-		case []map[string]interface{}:
-			// do nothing
-		default:
-			valueMap[name] = value.(string)
-		}
-
-	}
-	if len(valueMap) > 0 {
-		rt := ConfigSection{
-			Title:  "status",
-			Type:   "status",
-			Values: valueMap,
-		}
-		sections = append(sections, rt)
-	}
-
-	for name, value := range configToml.Status {
-
-		valueMap := make(ValueMap)
-		switch value.(type) {
-		case []map[string]interface{}:
-			{
-				m := value.([]map[string]interface{})
-				for _, v := range m {
-					for k, vv := range v {
-						switch vv.(type) {
-						case int64:
-							valueMap[k] = strconv.FormatInt(vv.(int64), 10)
-						case bool:
-							valueMap[k] = strconv.FormatBool(vv.(bool))
-						default:
-							valueMap[k] = vv.(string)
-						}
-					}
-				}
-			}
-		}
-
-		if len(valueMap) > 0 {
-			rt := ConfigSection{
-				Title:  "status",
-				Type:   "status",
-				Name:   name,
-				Values: valueMap,
-			}
-			sections = append(sections, rt)
-		}
-	}
+	sections = addStatusSections(sections, configToml.Status)
 
 	// broker sections
 	sections = addConfigSections(sections, "broker", configToml.Brokers)
