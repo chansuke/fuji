@@ -70,12 +70,12 @@ func TestIniNewDummyDevice(t *testing.T) {
 	conf, err := config.LoadConfig("testing_conf.toml")
 	brokerList, err := broker.NewBrokers(conf, make(chan message.Message))
 	assert.Nil(err)
-	for _, section := range conf.Sections {
-		if section.Type == "device" && section.Arg == "dummy" {
-			dummy, err := device.NewDummyDevice(section, brokerList, device.NewDeviceChannel())
-			assert.Nil(err)
-			assert.Equal("dummy", dummy.DeviceType())
-			assert.Equal(2, int(dummy.QoS))
-		}
-	}
+
+	section := config.SearchSection(&conf.Sections, "device", "dummy")
+	assert.NotNil(section)
+
+	dummy, err := device.NewDummyDevice(*section, brokerList, device.NewDeviceChannel())
+	assert.Nil(err)
+	assert.Equal("dummy", dummy.DeviceType())
+	assert.Equal(2, int(dummy.QoS))
 }

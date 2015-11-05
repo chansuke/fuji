@@ -156,6 +156,16 @@ func ValidMqttPublishTopic(v interface{}, param string) error {
 	return nil
 }
 
+// SearchSection finds the section matched condition args.
+func SearchSection(sections *[]ConfigSection, t, arg string) *ConfigSection {
+	for _, section := range *sections {
+		if section.Type == t && section.Arg == arg {
+			return &section
+		}
+	}
+	return nil
+}
+
 // LoadConfig loads toml format file from confPath arg and returns []ConfigSection.
 // ConfigSection has a Type, Name and arg.
 // example:
