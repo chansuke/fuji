@@ -38,7 +38,7 @@ func main() {
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:   "conf, c",
-			Value:  "/etc/fuji-gw/config.ini",
+			Value:  "/etc/fuji-gw/config.toml",
 			Usage:  "config filepath",
 			EnvVar: "FUJI_CONFIG_FILE",
 		},
