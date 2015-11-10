@@ -15,7 +15,7 @@ PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/bin
 
 DAEMON=/usr/local/bin/fuji-gw
 PIDFILE=/var/run/fuji-gwd.pid
-FUJI_GW_CONF=/etc/fuji-gw/config.ini
+FUJI_GW_CONF=/etc/fuji-gw/config.toml
 
 test -x $DAEMON || exit 5
 
