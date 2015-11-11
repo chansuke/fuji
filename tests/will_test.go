@@ -24,8 +24,8 @@ import (
 
 	"github.com/shiguredo/fuji"
 	"github.com/shiguredo/fuji/broker"
+	"github.com/shiguredo/fuji/config"
 	"github.com/shiguredo/fuji/gateway"
-	"github.com/shiguredo/fuji/inidef"
 )
 
 // TestWillJustPublish tests
@@ -35,21 +35,21 @@ import (
 func TestWillJustPublish(t *testing.T) {
 	assert := assert.New(t)
 
-	iniStr := `
+	configStr := `
 	[gateway]
-	    name = willjustpublishham
-	[broker "local/1"]
-	    host = localhost
+	    name = "willjustpublishham"
+	[[broker."local/1"]]
+	    host = "localhost"
 	    port = 1883
-	    will_message = no letter is good letter.
-	[device "dora/dummy"]
-	    broker = local
+	    will_message = "no letter is good letter."
+	[[device."dora/dummy"]]
+	    broker = "local"
 	    qos = 0
 	    interval = 10
-	    payload = Hello will just publish world.
-	    type = EnOcean
+	    payload = "Hello will just publish world."
+	    type = "EnOcean"
 `
-	conf, err := inidef.LoadConfigByte([]byte(iniStr))
+	conf, err := config.LoadConfigByte([]byte(configStr))
 	assert.Nil(err)
 	commandChannel := make(chan string)
 	go fuji.StartByFileWithChannel(conf, commandChannel)
@@ -66,21 +66,21 @@ func TestWillJustPublish(t *testing.T) {
 func TestWillSubscribePublishClose(t *testing.T) {
 	assert := assert.New(t)
 
-	iniStr := `
+	configStr := `
 	[gateway]
-	    name = testwillafterclose
-	[broker "local/1"]
-	    host = localhost
+	    name = "testwillafterclose"
+	[[broker."local/1"]]
+	    host = "localhost"
 	    port = 1883
-	    will_message = good letter is no letter.
-	[device "dora/dummy"]
-	    broker = local
+	    will_message = "good letter is no letter."
+	[[device."dora/dummy"]]
+	    broker = "local"
 	    qos = 0
 	    interval = 10
-	    payload = Hello will just publish world.
-	    type = EnOcean
+	    payload = "Hello will just publish world."
+	    type = "EnOcean"
 `
-	ok := genericWillTestDriver(t, iniStr, "/testwillafterclose/will", []byte("good letter is no letter."))
+	ok := genericWillTestDriver(t, configStr, "/testwillafterclose/will", []byte("good letter is no letter."))
 	assert.True(ok, "Failed to receive Will message")
 }
 
@@ -90,74 +90,74 @@ func TestWillSubscribePublishClose(t *testing.T) {
 // 3. force disconnect
 // 4. check subscriber receives will message
 func TestWillSubscribePublishCloseEmpty(t *testing.T) {
-	iniStr := `
+	configStr := `
 	[gateway]
-	    name = testwillaftercloseemptywill
-	[broker "local/1"]
-	    host = localhost
+	    name = "testwillaftercloseemptywill"
+	[[broker."local/1"]]
+	    host = "localhost"
 	    port = 1883
-	    will_message = 
-	[device "dora/dummy"]
-	    broker = local
+	    will_message = ""
+	[[device."dora/dummy"]]
+	    broker = "local"
 	    qos = 0
 	    interval = 10
-	    payload = Hello will just publish world.
-	    type = EnOcean
+	    payload = "Hello will just publish world."
+	    type = "EnOcean"
 `
-	ok := genericWillTestDriver(t, iniStr, "/testwillaftercloseemptywill/will", []byte{})
+	ok := genericWillTestDriver(t, configStr, "/testwillaftercloseemptywill/will", []byte{})
 	if !ok {
 		t.Error("Failed to receive Empty Will message")
 	}
 }
 
 func TestWillSubscribePublishBinaryWill(t *testing.T) {
-	iniStr := `
+	configStr := `
 	[gateway]
-	    name = binary
-	[broker "local/1"]
-	    host = localhost
+	    name = "binary"
+	[[broker."local/1"]]
+	    host = "localhost"
 	    port = 1883
-	    will_message = \x01\x02
-	[device "dora/dummy"]
-	    broker = local
+	    will_message = "\\x01\\x02"
+	[[device."dora/dummy"]]
+	    broker = "local"
 	    qos = 0
 	    interval = 10
-	    payload = Hello will just publish world.
-	    type = EnOcean
+	    payload = "Hello will just publish world."
+	    type = "EnOcean"
 `
-	ok := genericWillTestDriver(t, iniStr, "/binary/will", []byte{1, 2})
+	ok := genericWillTestDriver(t, configStr, "/binary/will", []byte{1, 2})
 	if !ok {
 		t.Error("Failed to receive Empty Will message")
 	}
 }
 
 func TestWillSubscribePublishWillWithWillTopic(t *testing.T) {
-	iniStr := `
+	configStr := `
 	[gateway]
-	    name = with
-	[broker "local/1"]
-	    host = localhost
+	    name = "with"
+	[[broker."local/1"]]
+	    host = "localhost"
 	    port = 1883
-	    will_message = msg
-	    will_topic = willtopic
+	    will_message = "msg"
+	    will_topic = "willtopic"
 `
-	ok := genericWillTestDriver(t, iniStr, "/willtopic", []byte("msg"))
+	ok := genericWillTestDriver(t, configStr, "/willtopic", []byte("msg"))
 	if !ok {
 		t.Error("Failed to receive Empty Will message")
 	}
 }
 
 func TestWillSubscribePublishWillWithNestedWillTopic(t *testing.T) {
-	iniStr := `
+	configStr := `
 	[gateway]
-	    name = with
-	[broker "local/1"]
-	    host = localhost
+	    name = "with"
+	[[broker."local/1"]]
+	    host = "localhost"
 	    port = 1883
-	    will_message = msg
-	    will_topic = willtopic/nested
+	    will_message = "msg"
+	    will_topic = "willtopic/nested"
 `
-	ok := genericWillTestDriver(t, iniStr, "/willtopic/nested", []byte("msg"))
+	ok := genericWillTestDriver(t, configStr, "/willtopic/nested", []byte("msg"))
 	if !ok {
 		t.Error("Failed to receive Empty Will message")
 	}
@@ -170,10 +170,10 @@ func TestWillSubscribePublishWillWithNestedWillTopic(t *testing.T) {
 // 4. force disconnect
 // 5. check subscriber receives will message
 
-func genericWillTestDriver(t *testing.T, iniStr string, expectedTopic string, expectedPayload []byte) (ok bool) {
+func genericWillTestDriver(t *testing.T, configStr string, expectedTopic string, expectedPayload []byte) (ok bool) {
 	assert := assert.New(t)
 
-	conf, err := inidef.LoadConfigByte([]byte(iniStr))
+	conf, err := config.LoadConfigByte([]byte(configStr))
 	assert.Nil(err)
 	commandChannel := make(chan string)
 	go fuji.StartByFileWithChannel(conf, commandChannel)
@@ -188,7 +188,7 @@ func genericWillTestDriver(t *testing.T, iniStr string, expectedTopic string, ex
 		time.Sleep(1 * time.Second)
 
 		subscriberChannel, err := setupWillSubscriber(gw, brokers[0])
-		if err != inidef.Error("") {
+		if err != config.Error("") {
 			t.Error(err)
 		}
 
@@ -211,7 +211,7 @@ func genericWillTestDriver(t *testing.T, iniStr string, expectedTopic string, ex
 }
 
 // setupWillSubscriber start subscriber process and returnes a channel witch can receive will message.
-func setupWillSubscriber(gw *gateway.Gateway, broker *broker.Broker) (chan MQTT.Message, inidef.Error) {
+func setupWillSubscriber(gw *gateway.Gateway, broker *broker.Broker) (chan MQTT.Message, config.Error) {
 	// Setup MQTT pub/sub client to confirm published content.
 	//
 	messageOutputChannel := make(chan MQTT.Message)
@@ -227,10 +227,10 @@ func setupWillSubscriber(gw *gateway.Gateway, broker *broker.Broker) (chan MQTT.
 
 	client := MQTT.NewClient(opts)
 	if client == nil {
-		return nil, inidef.Error("NewClient failed")
+		return nil, config.Error("NewClient failed")
 	}
 	if token := client.Connect(); token.Wait() && token.Error() != nil {
-		return nil, inidef.Error(fmt.Sprintf("NewClient Start failed %q", token.Error()))
+		return nil, config.Error(fmt.Sprintf("NewClient Start failed %q", token.Error()))
 	}
 
 	qos := 0
@@ -240,5 +240,5 @@ func setupWillSubscriber(gw *gateway.Gateway, broker *broker.Broker) (chan MQTT.
 		messageOutputChannel <- msg
 	})
 
-	return messageOutputChannel, inidef.Error("")
+	return messageOutputChannel, config.Error("")
 }

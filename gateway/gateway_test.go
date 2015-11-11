@@ -20,13 +20,13 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/shiguredo/fuji/inidef"
+	"github.com/shiguredo/fuji/config"
 )
 
 func TestNewGateway(t *testing.T) {
 	assert := assert.New(t)
 
-	conf, err := inidef.LoadConfig("../tests/testing_conf.ini")
+	conf, err := config.LoadConfig("../tests/testing_conf.toml")
 	gw, err := NewGateway(conf)
 	assert.Nil(err)
 	assert.Equal("ham", gw.Name)
@@ -39,37 +39,37 @@ func TestNewGatewayInvalidName(t *testing.T) {
 	assert := assert.New(t)
 
 	{ // includes plus
-		iniStr := `
+		configStr := `
 [gateway]
-name = bone+lessham
+name = "bone+lessham"
 `
-		conf, err := inidef.LoadConfigByte([]byte(iniStr))
+		conf, err := config.LoadConfigByte([]byte(configStr))
 		_, err = NewGateway(conf)
 		assert.NotNil(err)
 	}
 	{ // includes sharp
-		iniStr := `
+		configStr := `
 [gateway]
-name = ` + "`" + `bone\#lessham`
-		conf, err := inidef.LoadConfigByte([]byte(iniStr))
+name = "bone#lessham"`
+		conf, err := config.LoadConfigByte([]byte(configStr))
 		_, err = NewGateway(conf)
 		assert.NotNil(err)
 	}
 	{ // too long
-		iniStr := `
+		configStr := `
 [gateway]
-name = bonelesshaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+name = "bonelesshaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 `
-		conf, err := inidef.LoadConfigByte([]byte(iniStr))
+		conf, err := config.LoadConfigByte([]byte(configStr))
 		_, err = NewGateway(conf)
 		assert.NotNil(err)
 	}
 	{ // \\U0000 string
-		iniStr := fmt.Sprintf(`
+		configStr := fmt.Sprintf(`
 [gateway]
-name = 	na%cme
+name = 	"na%cme"
 `, '\u0000')
-		conf, err := inidef.LoadConfigByte([]byte(iniStr))
+		conf, err := config.LoadConfigByte([]byte(configStr))
 		_, err = NewGateway(conf)
 		assert.NotNil(err)
 	}
@@ -79,43 +79,43 @@ func TestNewGatewayMaxRetryCount(t *testing.T) {
 	assert := assert.New(t)
 
 	{ // default
-		iniStr := `
+		configStr := `
 [gateway]
-name = sango
+name = "sango"
 `
-		conf, err := inidef.LoadConfigByte([]byte(iniStr))
+		conf, err := config.LoadConfigByte([]byte(configStr))
 		gw, err := NewGateway(conf)
 		assert.Nil(err)
 		assert.Equal(3, gw.MaxRetryCount)
 	}
 	{ // specified
-		iniStr := `
+		configStr := `
 [gateway]
-name = sango
+name = "sango"
 max_retry_count = 10
 `
-		conf, err := inidef.LoadConfigByte([]byte(iniStr))
+		conf, err := config.LoadConfigByte([]byte(configStr))
 		gw, err := NewGateway(conf)
 		assert.Nil(err)
 		assert.Equal(10, gw.MaxRetryCount)
 	}
 	{ // minus fail validation
-		iniStr := `
+		configStr := `
 [gateway]
-name = sango
+name = "sango"
 max_retry_count = -10
 `
-		conf, err := inidef.LoadConfigByte([]byte(iniStr))
+		conf, err := config.LoadConfigByte([]byte(configStr))
 		_, err = NewGateway(conf)
 		assert.NotNil(err)
 	}
 	{ // invalid int
-		iniStr := `
+		configStr := `
 [gateway]
-name = sango
+name = "sango"
 max_retry_count = aabbcc
 `
-		conf, err := inidef.LoadConfigByte([]byte(iniStr))
+		conf, err := config.LoadConfigByte([]byte(configStr))
 		_, err = NewGateway(conf)
 		assert.NotNil(err)
 	}
@@ -125,43 +125,43 @@ func TestNewGatewayRetryInterval(t *testing.T) {
 	assert := assert.New(t)
 
 	{ // default
-		iniStr := `
+		configStr := `
 [gateway]
-name = sango
+name = "sango"
 `
-		conf, err := inidef.LoadConfigByte([]byte(iniStr))
+		conf, err := config.LoadConfigByte([]byte(configStr))
 		gw, err := NewGateway(conf)
 		assert.Nil(err)
 		assert.Equal(3, gw.RetryInterval)
 	}
 	{ // specified
-		iniStr := `
+		configStr := `
 [gateway]
-name = sango
+name = "sango"
 retry_interval = 10
 `
-		conf, err := inidef.LoadConfigByte([]byte(iniStr))
+		conf, err := config.LoadConfigByte([]byte(configStr))
 		gw, err := NewGateway(conf)
 		assert.Nil(err)
 		assert.Equal(10, gw.RetryInterval)
 	}
 	{ // minus fail validation
-		iniStr := `
+		configStr := `
 [gateway]
-name = sango
+name = "sango"
 retry_interval = -10
 `
-		conf, err := inidef.LoadConfigByte([]byte(iniStr))
+		conf, err := config.LoadConfigByte([]byte(configStr))
 		_, err = NewGateway(conf)
 		assert.NotNil(err)
 	}
 	{ // invalid int
-		iniStr := `
+		configStr := `
 [gateway]
-name = sango
+name = "sango"
 retry_interval = aabbcc
 `
-		conf, err := inidef.LoadConfigByte([]byte(iniStr))
+		conf, err := config.LoadConfigByte([]byte(configStr))
 		_, err = NewGateway(conf)
 		assert.NotNil(err)
 	}

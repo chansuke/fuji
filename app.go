@@ -18,14 +18,14 @@ import (
 	log "github.com/Sirupsen/logrus"
 
 	"github.com/shiguredo/fuji/broker"
+	"github.com/shiguredo/fuji/config"
 	"github.com/shiguredo/fuji/device"
 	"github.com/shiguredo/fuji/gateway"
-	"github.com/shiguredo/fuji/inidef"
 )
 
 // Start make command channel and start gateway.
 func Start(configPath string) {
-	conf, err := inidef.LoadConfig(configPath)
+	conf, err := config.LoadConfig(configPath)
 	if err != nil {
 		log.Fatalf("loading ini file faild, %v", err)
 	}
@@ -39,7 +39,7 @@ func Start(configPath string) {
 }
 
 // StartByFileWithChannel starts Gateway with command Channel
-func StartByFileWithChannel(conf inidef.Config, commandChannel chan string) error {
+func StartByFileWithChannel(conf config.Config, commandChannel chan string) error {
 	gw, err := gateway.NewGateway(conf)
 	if err != nil {
 		log.Fatalf("gateway create error, %v", err)

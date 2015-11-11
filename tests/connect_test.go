@@ -24,16 +24,16 @@ import (
 
 	"github.com/shiguredo/fuji"
 	"github.com/shiguredo/fuji/broker"
+	"github.com/shiguredo/fuji/config"
 	"github.com/shiguredo/fuji/device"
 	"github.com/shiguredo/fuji/gateway"
-	"github.com/shiguredo/fuji/inidef"
 )
 
 // publish test to broker on localhost
 // dummydevice is used as a source of published message
 func TestConnectLocalPub(t *testing.T) {
 
-	go fuji.Start("connectlocalpub.ini")
+	go fuji.Start("connectlocalpub.toml")
 
 	time.Sleep(2 * time.Second)
 }
@@ -50,7 +50,7 @@ func TestConnectLocalPubSub(t *testing.T) {
 	// publised messages confirmed by subscriber
 
 	// get config
-	conf, err := inidef.LoadConfig("connectlocalpubsub.ini")
+	conf, err := config.LoadConfig("connectlocalpubsub.toml")
 	assert.Nil(err)
 
 	// get Gateway
@@ -62,7 +62,7 @@ func TestConnectLocalPubSub(t *testing.T) {
 	assert.Nil(err)
 
 	// get DummyDevice
-	dummyDevice, err := device.NewDummyDevice(conf.Sections[3], brokerList, device.NewDeviceChannel())
+	dummyDevice, err := device.NewDummyDevice(conf.Sections[2], brokerList, device.NewDeviceChannel())
 	assert.Nil(err)
 	assert.NotNil(dummyDevice)
 

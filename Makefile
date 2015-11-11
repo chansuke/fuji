@@ -38,43 +38,43 @@ build: fmt deps
 
 arm5: deps
 	GOARM=5 gox $(LDFLAGS) -os="linux" -arch="arm" -output=$(BUILDDIR)/arm5/fuji/fuji-gw $(REPO)
-	cp -p packages/config.simple.ini.example $(BUILDDIR)/arm5/fuji/config.ini.example
+	cp -p packages/config.simple.toml.example $(BUILDDIR)/arm5/fuji/config.toml.example
 	cd $(BUILDDIR)/arm5/ && tar zcvf ../../$(ARTIFACTS)/fuji-gw_$(TAG)_arm5.tar.gz fuji
 	echo 'linux arm5 build completed'
 
 arm6: deps
 	GOARM=6 gox $(LDFLAGS) -os="linux" -arch="arm" -output=$(BUILDDIR)/arm6/fuji/fuji-gw $(REPO)
-	cp -p packages/config.simple.ini.example $(BUILDDIR)/arm6/fuji/config.ini.example
+	cp -p packages/config.simple.toml.example $(BUILDDIR)/arm6/fuji/config.toml.example
 	cd $(BUILDDIR)/arm6/ && tar zcvf ../../$(ARTIFACTS)/fuji-gw_$(TAG)_arm6.tar.gz fuji
 	echo 'linux arm6 build completed'
 
 arm7: deps
 	GOARM=7 gox $(LDFLAGS) -os="linux" -arch="arm" -output=$(BUILDDIR)/arm7/fuji/fuji-gw $(REPO)
-	cp -p packages/config.simple.ini.example $(BUILDDIR)/arm7/fuji/config.ini.example
+	cp -p packages/config.simple.toml.example $(BUILDDIR)/arm7/fuji/config.toml.example
 	cd $(BUILDDIR)/arm7/ && tar zcvf ../../$(ARTIFACTS)/fuji-gw_$(TAG)_arm7.tar.gz fuji
 	echo 'linux arm7 build completed'
 
 linux_386: deps
 	gox $(LDFLAGS) -os="linux" -arch="386" -output=$(BUILDDIR)/linux_386/fuji/fuji-gw $(REPO)
-	cp -p packages/config.simple.ini.example $(BUILDDIR)/linux_386/fuji/config.ini.example
+	cp -p packages/config.simple.toml.example $(BUILDDIR)/linux_386/fuji/config.toml.example
 	cd $(BUILDDIR)/linux_386/ && tar zcvf ../../$(ARTIFACTS)/fuji-gw_$(TAG)_linux_386.tar.gz fuji
 	echo 'linux 386 build completed'
 
 linux_amd64: deps
 	gox $(LDFLAGS) -os="linux" -arch="amd64" -output=$(BUILDDIR)/linux_amd64/fuji/fuji-gw $(REPO)
-	cp -p packages/config.simple.ini.example $(BUILDDIR)/linux_amd64/fuji/config.ini.example
+	cp -p packages/config.simple.toml.example $(BUILDDIR)/linux_amd64/fuji/config.toml.example
 	cd $(BUILDDIR)/linux_amd64/ && tar zcvf ../../$(ARTIFACTS)/fuji-gw_$(TAG)_linux_amd64.tar.gz fuji
 	echo 'linux amd64 build completed'
 
 # freebsd_amd64: deps
 # 	gox $(LDFLAGS) -os="freebsd" -arch="amd64" -output=$(BUILDDIR)/freebsd_amd64/fuji/fuji-gw $(REPO)
-# 	cp -p packages/config.simple.ini.example $(BUILDDIR)/freebsd_amd64/fuji/config.ini.example
+# 	cp -p packages/config.simple.toml.example $(BUILDDIR)/freebsd_amd64/fuji/config.toml.example
 # 	cd $(BUILDDIR)/freebsd_amd64/ && tar zcvf ../../$(ARTIFACTS)/fuji-gw_$(TAG)_freebsd_amd64.tar.gz fuji
 # 	echo 'freebsd amd64 build completed'
 
 # darwin_amd64: deps
 # 	gox $(LDFLAGS) -os="darwin" -arch="amd64" -output=$(BUILDDIR)/darwin/fuji/fuji-gw $(REPO)
-# 	cp -p packages/config.simple.ini.example $(BUILDDIR)/darwin/fuji/config.ini.example
+# 	cp -p packages/config.simple.toml.example $(BUILDDIR)/darwin/fuji/config.toml.example
 # 	cd $(BUILDDIR)/darwin/ && tar zcvf ../../$(ARTIFACTS)/fuji-gw_$(TAG)_darwin_amd64.tar.gz fuji
 # 	echo 'darwin amd64 build completed'
 
@@ -87,7 +87,7 @@ raspi: deps arm6
 	mkdir -p $(BUILDDIR)/packages_raspi/etc/fuji-gw
 	mkdir -p $(BUILDDIR)/packages_raspi/etc/init.d
 	cp -p $(BUILDDIR)/arm6/fuji/fuji-gw $(BUILDDIR)/packages_raspi/usr/local/bin/fuji-gw
-	cp -p packages/config.simple.ini.example $(BUILDDIR)/packages_raspi/etc/fuji-gw/config.ini
+	cp -p packages/config.simple.toml.example $(BUILDDIR)/packages_raspi/etc/fuji-gw/config.toml
 	cp -p packages/fuji-gw.init $(BUILDDIR)/packages_raspi/etc/init.d/
 	cd $(BUILDDIR)/packages_raspi; $(FPM) -s dir -t deb -a armhf -n fuji-gw -v $(TAG) -p ../../$(ARTIFACTS) --deb-init ./etc/init.d/fuji-gw.init .
 	mv $(ARTIFACTS)/fuji-gw_$(TAG)_armhf.deb $(ARTIFACTS)/fuji-gw_$(TAG)_raspi_arm6.deb
@@ -98,7 +98,7 @@ raspi2: deps arm7
 	mkdir -p $(BUILDDIR)/packages_raspi2/usr/local/bin
 	mkdir -p $(BUILDDIR)/packages_raspi2/etc/fuji-gw
 	cp -p $(BUILDDIR)/arm7/fuji/fuji-gw $(BUILDDIR)/packages_raspi2/usr/local/bin/fuji-gw
-	cp -p packages/config.simple.ini.example $(BUILDDIR)/packages_raspi2/etc/fuji-gw/config.ini
+	cp -p packages/config.simple.toml.example $(BUILDDIR)/packages_raspi2/etc/fuji-gw/config.toml
 	cd $(BUILDDIR)/packages_raspi2; $(FPM) -s dir -t deb -a armhf -n fuji-gw -v $(TAG) -p ../../$(ARTIFACTS) .
 	mv $(ARTIFACTS)/fuji-gw_$(TAG)_armhf.deb $(ARTIFACTS)/fuji-gw_$(TAG)_raspi2_arm7.deb
 
@@ -108,7 +108,7 @@ armadillo: deps arm5
 	mkdir -p $(BUILDDIR)/packages_armadillo/usr/local/bin
 	mkdir -p $(BUILDDIR)/packages_armadillo/etc/fuji-gw
 	cp -p $(BUILDDIR)/arm5/fuji/fuji-gw $(BUILDDIR)/packages_armadillo/usr/local/bin/fuji-gw
-	cp -p packages/config.simple.ini.example $(BUILDDIR)/packages_armadillo/etc/fuji-gw/config.ini
+	cp -p packages/config.simple.toml.example $(BUILDDIR)/packages_armadillo/etc/fuji-gw/config.toml
 	cd $(BUILDDIR)/packages_armadillo; $(FPM) -s dir -t deb -a armle -n fuji-gw -v $(TAG) -p .. .
 
 edison: linux_386
@@ -118,7 +118,7 @@ edison: linux_386
 	mkdir -p $(BUILDDIR)/packages_edison/etc/fuji-gw
 
 	cp -p $(BUILDDIR)/linux_386/fuji/fuji-gw $(BUILDDIR)/packages_edison/usr/local/bin/fuji-gw
-	cp -p packages/config.simple.ini.example $(BUILDDIR)/packages_edison/etc/fuji-gw/config.ini
+	cp -p packages/config.simple.toml.example $(BUILDDIR)/packages_edison/etc/fuji-gw/config.toml
 
 	mkdir -p $(BUILDDIR)/packages_edison/CONTROL
 	sed -e 's/FUJI_GIT_TAG/$(TAG)/' packages/opkg_files/control.in > packages/opkg_files/control
@@ -133,7 +133,7 @@ linux_amd64_deb: linux_amd64
 	mkdir -p $(BUILDDIR)/packages_linux_amd64/usr/local/bin
 	mkdir -p $(BUILDDIR)/packages_linux_amd64/etc/fuji-gw
 	cp -p $(BUILDDIR)/linux_amd64/fuji/fuji-gw $(BUILDDIR)/packages_linux_amd64/usr/local/bin/fuji-gw
-	cp -p packages/config.simple.ini.example $(BUILDDIR)/packages_linux_amd64/etc/fuji-gw/config.ini
+	cp -p packages/config.simple.toml.example $(BUILDDIR)/packages_linux_amd64/etc/fuji-gw/config.toml
 	cd $(BUILDDIR)/packages_linux_amd64; $(FPM) -s dir -t deb -a x86_64 -n fuji-gw -v $(TAG) -p ../../$(ARTIFACTS) .
 
 
