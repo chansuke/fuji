@@ -37,19 +37,19 @@ func TestSearchBrokerSection(t *testing.T) {
 
 }
 
-func TestSearchDeviceSection(t *testing.T) {
+func TestSearchDeviceType(t *testing.T) {
 	assert := assert.New(t)
 
 	conf, err := LoadConfig("../tests/testing_conf.toml")
 	assert.Nil(err)
 
-	section := SearchSection(&conf.Sections, "device", "serial")
+	section := SearchDeviceType(&conf.Sections, "serial")
 	assert.NotNil(section)
 
-	section = SearchSection(&conf.Sections, "device", "dummy")
+	section = SearchDeviceType(&conf.Sections, "dummy")
 	assert.NotNil(section)
 
-	section = SearchSection(&conf.Sections, "device", "notfound")
+	section = SearchDeviceType(&conf.Sections, "notfound")
 	assert.Nil(section)
 
 }
