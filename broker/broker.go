@@ -272,7 +272,7 @@ func (b *Broker) GenerateTopic(msg *message.Message) (message.TopicString, error
 	case "status": // status device topic structure is difference
 		topicString = strings.Join([]string{b.TopicPrefix, msg.Topic}, "/")
 	default:
-		topicString = strings.Join([]string{b.TopicPrefix, b.GatewayName, msg.Sender, msg.Type}, "/")
+		topicString = strings.Join([]string{b.TopicPrefix, b.GatewayName, msg.Sender, msg.Type, "publish"}, "/")
 	}
 
 	topic := message.TopicString{
