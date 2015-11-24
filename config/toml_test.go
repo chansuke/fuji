@@ -45,9 +45,13 @@ func TestSearchDeviceType(t *testing.T) {
 
 	section := SearchDeviceType(&conf.Sections, "serial")
 	assert.NotNil(section)
+	assert.Equal("device", section.Type)
+	assert.Equal("serial", section.Values["type"])
 
 	section = SearchDeviceType(&conf.Sections, "dummy")
 	assert.NotNil(section)
+	assert.Equal("device", section.Type)
+	assert.Equal("dummy", section.Values["type"])
 
 	section = SearchDeviceType(&conf.Sections, "notfound")
 	assert.Nil(section)
