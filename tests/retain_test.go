@@ -131,7 +131,7 @@ func TestRetainSubscribePublishClose(t *testing.T) {
 		retainedTopic := retainedMessage[0]
 		retainedPayload := retainedMessage[1]
 
-		expectedTopic := fmt.Sprintf("%s/%s/%s/%s", brokerList[0].TopicPrefix, gw.Name, dummyDevice.Name, dummyDevice.Type)
+		expectedTopic := fmt.Sprintf("%s/%s/%s/%s/publish", brokerList[0].TopicPrefix, gw.Name, dummyDevice.Name, dummyDevice.Type)
 		expectedPayload := dummyDevice.Payload
 
 		assert.Equal(expectedTopic, retainedTopic)
@@ -164,7 +164,7 @@ func setupRetainSubscriber(gw *gateway.Gateway, broker *broker.Broker, dummyDevi
 		return nil, config.Error(fmt.Sprintf("NewClient Start failed %q", token.Error()))
 	}
 	qos := 0
-	retainedTopic := fmt.Sprintf("%s/%s/%s/%s", broker.TopicPrefix, gw.Name, dummyDevice.Name, dummyDevice.Type)
+	retainedTopic := fmt.Sprintf("%s/%s/%s/%s/publish", broker.TopicPrefix, gw.Name, dummyDevice.Name, dummyDevice.Type)
 	client.Subscribe(retainedTopic, byte(qos), func(client *MQTT.Client, msg MQTT.Message) {
 	})
 

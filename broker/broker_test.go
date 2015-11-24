@@ -187,14 +187,14 @@ func TestGenerateTopic(t *testing.T) {
 	}
 	t1, err := b.GenerateTopic(msg1)
 	assert.Nil(err)
-	assert.Equal("prefix/gw/s/t", t1.Str)
+	assert.Equal("prefix/gw/s/t/publish", t1.Str)
 
 	msg2 := &message.Message{
 		Sender: "s1",
 	}
 	t2, err := b.GenerateTopic(msg2)
 	assert.Nil(err)
-	assert.Equal("prefix/gw/s1/", t2.Str)
+	assert.Equal("prefix/gw/s1//publish", t2.Str)
 }
 
 func TestGenerateTopicStatus(t *testing.T) {

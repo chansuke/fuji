@@ -1,6 +1,6 @@
 [gateway]
 
-    name = "ham"
+    name = "hamlocalconnect"
 
 [[broker."mosquitto/1"]]
 

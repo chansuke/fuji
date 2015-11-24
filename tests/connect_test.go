@@ -33,9 +33,10 @@ import (
 // dummydevice is used as a source of published message
 func TestConnectLocalPub(t *testing.T) {
 
-	go fuji.Start("connectlocalpub.toml")
+	go fuji.Start("connect.toml")
 
 	time.Sleep(2 * time.Second)
+	return
 }
 
 // TestConnectLocalPubSub tests
@@ -50,7 +51,7 @@ func TestConnectLocalPubSub(t *testing.T) {
 	// publised messages confirmed by subscriber
 
 	// get config
-	conf, err := config.LoadConfig("connectlocalpubsub.toml")
+	conf, err := config.LoadConfig("connect.toml")
 	assert.Nil(err)
 
 	// get Gateway
@@ -73,11 +74,8 @@ func TestConnectLocalPubSub(t *testing.T) {
 	opts := MQTT.NewClientOptions()
 	url := fmt.Sprintf("tcp://%s:%d", brokerList[0].Host, brokerList[0].Port)
 	opts.AddBroker(url)
-	opts.SetClientID(gw.Name)
+	opts.SetClientID(fmt.Sprintf("prefix%s", gw.Name))
 	opts.SetCleanSession(false)
-	opts.SetDefaultPublishHandler(func(client *MQTT.Client, msg MQTT.Message) {
-		subscriberChannel <- [2]string{msg.Topic(), string(msg.Payload())}
-	})
 
 	client := MQTT.NewClient(opts)
 	assert.Nil(err)
@@ -86,22 +84,21 @@ func TestConnectLocalPubSub(t *testing.T) {
 	}
 
 	qos := 0
-	topic := "#"
-	client.Subscribe(topic, byte(qos), func(client *MQTT.Client, msg MQTT.Message) {
+	expectedTopic := fmt.Sprintf("/%s/%s/%s/publish", gw.Name, dummyDevice.Name, dummyDevice.Type)
+	expectedMessage := fmt.Sprintf("%s", dummyDevice.Payload)
+	fmt.Printf("expetcted topic: %s\nexpected message%s", expectedTopic, expectedMessage)
+	client.Subscribe(expectedTopic, byte(qos), func(client *MQTT.Client, msg MQTT.Message) {
+		subscriberChannel <- [2]string{msg.Topic(), string(msg.Payload())}
 	})
 
-	// TODO: should be write later
-	/*
-		channel := fuji.SetupMQTTChannel(client, gateway, brokerList[0])
+	// wait for 1 publication of dummy worker
+	select {
+	case message := <-subscriberChannel:
+		assert.Equal(expectedTopic, message[0])
+		assert.Equal(expectedMessage, message[1])
+	case <-time.After(time.Second * 11):
+		assert.Equal("subscribe completed in 11 sec", "not completed")
+	}
 
-		// Setup DummyDevice to publish test payload
-
-		dummyDevice.Start(channel)
-
-		// wait for 1 publication of dummy worker
-		message := <-subscriberChannel
-		assert.Equal("dummy", message)
-
-		client.Disconnect(250)
-	*/
+	client.Disconnect(20)
 }
