@@ -71,7 +71,7 @@ func TestIniNewDummyDevice(t *testing.T) {
 	brokerList, err := broker.NewBrokers(conf, make(chan message.Message))
 	assert.Nil(err)
 
-	section := config.SearchSection(&conf.Sections, "device", "dummy")
+	section := config.SearchDeviceType(&conf.Sections, "dummy")
 	assert.NotNil(section)
 
 	dummy, err := device.NewDummyDevice(*section, brokerList, device.NewDeviceChannel())

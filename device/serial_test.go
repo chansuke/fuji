@@ -27,13 +27,13 @@ func TestNewSerialDevice(t *testing.T) {
 	assert := assert.New(t)
 
 	configStr := `
-[[device."dora/serial"]]
+[[device."dora"]]
+    type = "serial"
     broker = "sango"
     qos = 1
     serial = "/dev/tty.ble"
     baud = 9600
     size = 4
-    type = "BLE"
 `
 	conf, err := config.LoadConfigByte([]byte(configStr))
 	b1 := &broker.Broker{Name: "sango"}
@@ -44,19 +44,19 @@ func TestNewSerialDevice(t *testing.T) {
 	assert.Equal("dora", b.Name)
 	assert.Equal(byte(1), b.QoS)
 	assert.Equal(4, b.Size)
-	assert.Equal("BLE", b.Type)
+	assert.Equal("serial", b.Type)
 }
 
 func TestNewSerialDeviceNotSetSize(t *testing.T) {
 	assert := assert.New(t)
 
 	configStr := `
-[[device."dora/serial"]]
+[[device."dora"]]
+    type = "serial"
     broker = "sango"
     qos = 1
     serial = "/dev/tty.ble"
     baud = 9600
-    type = "BLE"
 `
 	conf, err := config.LoadConfigByte([]byte(configStr))
 	b1 := &broker.Broker{Name: "sango"}
@@ -66,14 +66,15 @@ func TestNewSerialDeviceNotSetSize(t *testing.T) {
 	assert.NotNil(b.Broker)
 	assert.Equal("dora", b.Name)
 	assert.Equal(0, b.Size)
-	assert.Equal("BLE", b.Type)
+	assert.Equal("serial", b.Type)
 }
 
 func TestNewSerialDeviceInvalidInterval(t *testing.T) {
 	assert := assert.New(t)
 
 	configStr := `
-[[device."dora/serial"]]
+[[device."dora"]]
+    type = "serial"
     broker = "sango"
     interval = -1
     qos = 1
@@ -89,7 +90,8 @@ func TestNewSerialDeviceInvalidQoS(t *testing.T) {
 	assert := assert.New(t)
 
 	configStr := `
-[[device."dora/serial"]]
+[[device."dora"]]
+    type = "serial"
     broker = "sango"
     qos = -1
 `
@@ -104,7 +106,8 @@ func TestNewSerialDeviceInvalidBroker(t *testing.T) {
 	assert := assert.New(t)
 
 	configStr := `
-[[device."dora/serial"]]
+[[device."dora"]]
+    type = "serial"
     broker = "doesNotExist"
     qos = 1
 `
@@ -119,7 +122,8 @@ func TestNewSerialDeviceInvalidBaud(t *testing.T) {
 	assert := assert.New(t)
 
 	configStr := `
-[[device."dora/serial"]]
+[[device."dora"]]
+    type = "serial"
     broker = "sango"
     qos = -1
     baud = -9600

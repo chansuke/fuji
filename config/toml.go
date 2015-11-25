@@ -114,3 +114,13 @@ func SearchSection(sections *[]ConfigSection, t, arg string) *ConfigSection {
 	}
 	return nil
 }
+
+// SearchDeviceType find the device section matched type name string
+func SearchDeviceType(sections *[]ConfigSection, arg string) *ConfigSection {
+	for _, section := range *sections {
+		if section.Type == "device" && section.Values["type"] == arg {
+			return &section
+		}
+	}
+	return nil
+}

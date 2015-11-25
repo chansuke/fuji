@@ -42,12 +42,12 @@ func TestWillJustPublish(t *testing.T) {
 	    host = "localhost"
 	    port = 1883
 	    will_message = "no letter is good letter."
-	[[device."dora/dummy"]]
+	[[device."dora"]]
+	    type = "dummy"
 	    broker = "local"
 	    qos = 0
 	    interval = 10
 	    payload = "Hello will just publish world."
-	    type = "EnOcean"
 `
 	conf, err := config.LoadConfigByte([]byte(configStr))
 	assert.Nil(err)
@@ -73,12 +73,12 @@ func TestWillSubscribePublishClose(t *testing.T) {
 	    host = "localhost"
 	    port = 1883
 	    will_message = "good letter is no letter."
-	[[device."dora/dummy"]]
+	[[device."dora"]]
+	    type = "dummy"
 	    broker = "local"
 	    qos = 0
 	    interval = 10
 	    payload = "Hello will just publish world."
-	    type = "EnOcean"
 `
 	ok := genericWillTestDriver(t, configStr, "/testwillafterclose/will", []byte("good letter is no letter."))
 	assert.True(ok, "Failed to receive Will message")
@@ -97,12 +97,12 @@ func TestWillSubscribePublishCloseEmpty(t *testing.T) {
 	    host = "localhost"
 	    port = 1883
 	    will_message = ""
-	[[device."dora/dummy"]]
+	[[device."dora"]]
+	    type = "dummy"
 	    broker = "local"
 	    qos = 0
 	    interval = 10
 	    payload = "Hello will just publish world."
-	    type = "EnOcean"
 `
 	ok := genericWillTestDriver(t, configStr, "/testwillaftercloseemptywill/will", []byte{})
 	if !ok {
@@ -118,12 +118,12 @@ func TestWillSubscribePublishBinaryWill(t *testing.T) {
 	    host = "localhost"
 	    port = 1883
 	    will_message = "\\x01\\x02"
-	[[device."dora/dummy"]]
+	[[device."dora"]]
+	    type = "dummy"
 	    broker = "local"
 	    qos = 0
 	    interval = 10
 	    payload = "Hello will just publish world."
-	    type = "EnOcean"
 `
 	ok := genericWillTestDriver(t, configStr, "/binary/will", []byte{1, 2})
 	if !ok {
