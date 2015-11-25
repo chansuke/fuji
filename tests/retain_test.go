@@ -44,15 +44,15 @@ func TestRetainJustPublish(t *testing.T) {
 	    host = "localhost"
 	    port = 1883
 	
-	[[device."doraretain/dummy"]]
+	[[device."doraretain"]]
 	
+	    type = "dummy"
 	    broker = "local"
 	    qos = 0
 	
 	    interval = 10
 	    payload = "Hello world retain true."
 	
-	    type = "EnOcean"
 	    retain = true
 `
 	conf, err := config.LoadConfigByte([]byte(configStr))
@@ -81,15 +81,15 @@ func TestRetainSubscribePublishClose(t *testing.T) {
 	    host = "localhost"
 	    port = 1883
 	
-	[[device."dora/dummy"]]
+	[[device."dora"]]
 	
+	    type = "dummy"
 	    broker = "local"
 	    qos = 0
 	
 	    interval = 10
 	    payload = "Hello retained world to subscriber after close."
 	
-	    type = "EnOcean"
 	    retain = true
 `
 	commandChannel := make(chan string)

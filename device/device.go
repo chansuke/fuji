@@ -45,7 +45,7 @@ func NewDevices(conf config.Config, brokers []*broker.Broker) ([]Devicer, []Devi
 		devChan := NewDeviceChannel()
 		devChannels = append(devChannels, devChan)
 
-		switch section.Arg {
+		switch section.Values["type"] {
 		case "dummy":
 			device, err = NewDummyDevice(section, brokers, devChan)
 			if err != nil {
