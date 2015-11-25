@@ -34,6 +34,7 @@ import (
 // 2. send data with retaind flag dummy device normaly
 func TestRetainJustPublish(t *testing.T) {
 	assert := assert.New(t)
+
 	configStr := `
 	[gateway]
 	
@@ -52,11 +53,12 @@ func TestRetainJustPublish(t *testing.T) {
 	
 	    interval = 10
 	    payload = "Hello world retain true."
-	
 	    retain = true
 `
+
 	conf, err := config.LoadConfigByte([]byte(configStr))
 	assert.Nil(err)
+
 	commandChannel := make(chan string)
 	go fuji.StartByFileWithChannel(conf, commandChannel)
 
@@ -92,9 +94,49 @@ func TestRetainSubscribePublishClose(t *testing.T) {
 	
 	    retain = true
 `
-	commandChannel := make(chan string)
 	conf, err := config.LoadConfigByte([]byte(configStr))
 	assert.Nil(err)
+	isRetain := true
+	generalPubSubTest(t, conf, isRetain)
+}
+
+// TestNoRetainSubscribePublishClose
+// 1. connect gateway to local broker
+// 2. send data without retaind flag from dummy device
+// 3. disconnect
+// 4. reconnect
+// 5. subscirbe and receive data
+func TestNoRetainSubscribePublishClose(t *testing.T) {
+	assert := assert.New(t)
+	configStr := `
+	[gateway]
+	
+	    name = "testNoRetainafterclose"
+	
+	[[broker."local/1"]]
+	
+	    host = "localhost"
+	    port = 1883
+	
+	[[device."dora"]]
+	
+	    type = "dummy"
+	    broker = "local"
+	    qos = 0
+	
+	    interval = 10
+	    payload = "Hello retained world to subscriber after close."
+`
+	conf, err := config.LoadConfigByte([]byte(configStr))
+	assert.Nil(err)
+	isRetain := false
+	generalPubSubTest(t, conf, isRetain)
+}
+
+func generalPubSubTest(t *testing.T, conf config.Config, isRetain bool) {
+	assert := assert.New(t)
+
+	commandChannel := make(chan string)
 	go fuji.StartByFileWithChannel(conf, commandChannel)
 
 	gw, err := gateway.NewGateway(conf)
@@ -126,16 +168,27 @@ func TestRetainSubscribePublishClose(t *testing.T) {
 		if err != config.Error("") {
 			t.Error(err)
 		}
+
 		// check Retained message
-		retainedMessage := <-subscriberChannel
-		retainedTopic := retainedMessage[0]
-		retainedPayload := retainedMessage[1]
+		select {
+		case retainedMessage := <-subscriberChannel:
+			if !isRetain {
+				assert.Equal("retained message arrived", "no retain message shall come")
+			}
+			retainedTopic := retainedMessage[0]
+			retainedPayload := retainedMessage[1]
 
-		expectedTopic := fmt.Sprintf("%s/%s/%s/%s/publish", brokerList[0].TopicPrefix, gw.Name, dummyDevice.Name, dummyDevice.Type)
-		expectedPayload := dummyDevice.Payload
+			expectedTopic := fmt.Sprintf("%s/%s/%s/%s/publish", brokerList[0].TopicPrefix, gw.Name, dummyDevice.Name, dummyDevice.Type)
+			expectedPayload := dummyDevice.Payload
 
-		assert.Equal(expectedTopic, retainedTopic)
-		assert.Equal(expectedPayload, retainedPayload)
+			assert.Equal(expectedTopic, retainedTopic)
+			assert.Equal(expectedPayload, retainedPayload)
+
+		case <-time.After(time.Second * 2):
+			if isRetain {
+				assert.Equal("subscribe completed in 11 sec", "not completed")
+			}
+		}
 	}()
 	time.Sleep(5 * time.Second)
 }
