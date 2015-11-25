@@ -44,15 +44,14 @@ var configStr = `
     retry_interval = 10
 
 
-[[device."dora/dummy"]]
+[[device."dora"]]
+    type = "dummy"
 
     broker = "mosquitto"
     qos = 0
 
     interval = 10
     payload = "connect local pub only Hello world."
-
-    type = "EnOcean"
 `
 
 // TestTLSConnectLocalPub
