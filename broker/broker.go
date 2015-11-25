@@ -47,6 +47,7 @@ type Broker struct {
 	Password      string `validate:"max=256"`
 	RetryInterval int    `validate:"min=0"`
 	TopicPrefix   string `validate:"max=256"`
+	IsWill        bool
 	WillMessage   []byte `validate:"max=256"`
 	WillTopic     string `validate:"max=256,validtopic"`
 	Tls           bool
@@ -84,9 +85,9 @@ func init() {
 }
 
 // NewTLSConfig returns TLS config from CA Cert file path.
-func NewTLSConfig(caCertFilePath string) (*tls.Config, error) {
+func NewTLSConfig(b *Broker) (*tls.Config, error) {
 	certPool := x509.NewCertPool()
-	pemCerts, err := ioutil.ReadFile(caCertFilePath)
+	pemCerts, err := ioutil.ReadFile(b.CaCert)
 	if err != nil {
 		return nil, config.Error("Cert File could not be read.")
 	}
@@ -128,6 +129,7 @@ func NewBrokers(conf config.Config, gwChan chan message.Message) (Brokers, error
 			Username:      values["username"],
 			Password:      values["password"],
 			TopicPrefix:   values["topic_prefix"],
+			IsWill:        false,
 			WillMessage:   willMsg,
 			Tls:           false,
 			CaCert:        "",
@@ -135,6 +137,19 @@ func NewBrokers(conf config.Config, gwChan chan message.Message) (Brokers, error
 			Subscribed:    NewSubscribed(),
 			GwChan:        gwChan,
 		}
+
+		for k, v := range values {
+			if k == "will_message" {
+				broker.IsWill = true
+				w, err := utils.ParsePayload(v)
+				if err != nil {
+					log.Warnf("parse error will_message, %v", err)
+				}
+				log.Debugf("will_message, %v", w)
+				broker.WillMessage = w
+			}
+		}
+
 		priority := 1
 		if section.Arg != "" {
 			priority, err = strconv.Atoi(section.Arg)
@@ -160,11 +175,14 @@ func NewBrokers(conf config.Config, gwChan chan message.Message) (Brokers, error
 			}
 		}
 
-		if values["tls"] == "true" && values["cacert"] != "" {
+		if values["tls"] == "true" {
+			if values["cacert"] == "" {
+				return nil, fmt.Errorf("cacert must be set")
+			}
 			// validate certificate
 			broker.Tls = true
 			broker.CaCert = values["cacert"]
-			broker.TLSConfig, err = NewTLSConfig(broker.CaCert)
+			broker.TLSConfig, err = NewTLSConfig(broker)
 			if err != nil {
 				return nil, err
 			}
