@@ -58,6 +58,60 @@ func TestWillJustPublish(t *testing.T) {
 	//	fuji.Stop()
 }
 
+// TestWillWithPrefixSubscribePublishClose
+// 1. connect subscriber and publisher to localhost broker with will message with prefixed topic
+// 2. send data from a dummy device
+// 3. force disconnect
+// 4. check subscriber does not receives will message immediately
+func TestWillWithPrefixSubscribePublishClose(t *testing.T) {
+	assert := assert.New(t)
+
+	configStr := `
+	[gateway]
+	    name = "testprefixwill"
+	[[broker."local/1"]]
+	    host = "localhost"
+	    port = 1883
+	    will_message = "no letter is good letter."
+	    topic_prefix = "prefix"
+	[[device."dora"]]
+	    type = "dummy"
+	    broker = "local"
+	    qos = 0
+	    interval = 10
+	    payload = "Hello will with prefix."
+`
+	expectedWill := true
+	ok := genericWillTestDriver(t, configStr, "prefix/testprefixwill/will", []byte("Hello will with prefix."), expectedWill)
+	assert.True(ok, "Failed to receive Will with prefix message")
+}
+
+// TestNoWillSubscribePublishClose
+// 1. connect subscriber and publisher to localhost broker without will message
+// 2. send data from a dummy device
+// 3. force disconnect
+// 4. check subscriber does not receives will message immediately
+func TestNoWillSubscribePublishClose(t *testing.T) {
+	assert := assert.New(t)
+
+	configStr := `
+	[gateway]
+	    name = "testnowillafterclose"
+	[[broker."local/1"]]
+	    host = "localhost"
+	    port = 1883
+	[[device."dora"]]
+	    type = "dummy"
+	    broker = "local"
+	    qos = 0
+	    interval = 10
+	    payload = "Hello will just publish world."
+`
+	expectedWill := false
+	ok := genericWillTestDriver(t, configStr, "testnowillafterclose/will", []byte(""), expectedWill)
+	assert.True(ok, "Failed to receive Will message")
+}
+
 // TestWillSubscribePublishClose
 // 1. connect subscriber and publisher to localhost broker with will message
 // 2. send data from a dummy device
@@ -80,7 +134,8 @@ func TestWillSubscribePublishClose(t *testing.T) {
 	    interval = 10
 	    payload = "Hello will just publish world."
 `
-	ok := genericWillTestDriver(t, configStr, "/testwillafterclose/will", []byte("good letter is no letter."))
+	expectedWill := true
+	ok := genericWillTestDriver(t, configStr, "/testwillafterclose/will", []byte("good letter is no letter."), expectedWill)
 	assert.True(ok, "Failed to receive Will message")
 }
 
@@ -104,7 +159,8 @@ func TestWillSubscribePublishCloseEmpty(t *testing.T) {
 	    interval = 10
 	    payload = "Hello will just publish world."
 `
-	ok := genericWillTestDriver(t, configStr, "/testwillaftercloseemptywill/will", []byte{})
+	expectedWill := true
+	ok := genericWillTestDriver(t, configStr, "/testwillaftercloseemptywill/will", []byte{}, expectedWill)
 	if !ok {
 		t.Error("Failed to receive Empty Will message")
 	}
@@ -125,7 +181,8 @@ func TestWillSubscribePublishBinaryWill(t *testing.T) {
 	    interval = 10
 	    payload = "Hello will just publish world."
 `
-	ok := genericWillTestDriver(t, configStr, "/binary/will", []byte{1, 2})
+	expectedWill := true
+	ok := genericWillTestDriver(t, configStr, "/binary/will", []byte{1, 2}, expectedWill)
 	if !ok {
 		t.Error("Failed to receive Empty Will message")
 	}
@@ -141,7 +198,8 @@ func TestWillSubscribePublishWillWithWillTopic(t *testing.T) {
 	    will_message = "msg"
 	    will_topic = "willtopic"
 `
-	ok := genericWillTestDriver(t, configStr, "/willtopic", []byte("msg"))
+	expectedWill := true
+	ok := genericWillTestDriver(t, configStr, "/willtopic", []byte("msg"), expectedWill)
 	if !ok {
 		t.Error("Failed to receive Empty Will message")
 	}
@@ -157,7 +215,8 @@ func TestWillSubscribePublishWillWithNestedWillTopic(t *testing.T) {
 	    will_message = "msg"
 	    will_topic = "willtopic/nested"
 `
-	ok := genericWillTestDriver(t, configStr, "/willtopic/nested", []byte("msg"))
+	expectedWill := true
+	ok := genericWillTestDriver(t, configStr, "/willtopic/nested", []byte("msg"), expectedWill)
 	if !ok {
 		t.Error("Failed to receive Empty Will message")
 	}
@@ -170,7 +229,7 @@ func TestWillSubscribePublishWillWithNestedWillTopic(t *testing.T) {
 // 4. force disconnect
 // 5. check subscriber receives will message
 
-func genericWillTestDriver(t *testing.T, configStr string, expectedTopic string, expectedPayload []byte) (ok bool) {
+func genericWillTestDriver(t *testing.T, configStr string, expectedTopic string, expectedPayload []byte, expectedWill bool) (ok bool) {
 	assert := assert.New(t)
 
 	conf, err := config.LoadConfigByte([]byte(configStr))
@@ -199,11 +258,21 @@ func genericWillTestDriver(t *testing.T, configStr string, expectedTopic string,
 		fmt.Println("broker killed for getting will message")
 
 		// check will message
-		willMsg := <-subscriberChannel
+		select {
+		case willMsg := <-subscriberChannel:
+			if expectedWill {
+				assert.Equal(expectedTopic, willMsg.Topic())
+				assert.Equal(expectedPayload, willMsg.Payload())
+				assert.Equal(byte(0), willMsg.Qos())
+			} else {
+				assert.Equal("NO will message received within 1 sec", "unexpected will message received.")
+			}
+		case <-time.After(time.Second * 2):
+			if expectedWill {
+				assert.Equal("will message received within 1 sec", "not completed")
+			}
+		}
 
-		assert.Equal(expectedTopic, willMsg.Topic())
-		assert.Equal(expectedPayload, willMsg.Payload())
-		assert.Equal(byte(0), willMsg.Qos())
 	}()
 	time.Sleep(3 * time.Second)
 	ok = true
@@ -234,8 +303,7 @@ func setupWillSubscriber(gw *gateway.Gateway, broker *broker.Broker) (chan MQTT.
 	}
 
 	qos := 0
-	// assume topicPrefix == ""
-	willTopic := fmt.Sprintf("/%s/will", gw.Name)
+	willTopic := fmt.Sprintf("%s/%s/will", broker.TopicPrefix, gw.Name)
 	client.Subscribe(willTopic, byte(qos), func(client *MQTT.Client, msg MQTT.Message) {
 		messageOutputChannel <- msg
 	})
