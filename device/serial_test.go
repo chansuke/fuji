@@ -27,7 +27,7 @@ func TestNewSerialDevice(t *testing.T) {
 	assert := assert.New(t)
 
 	configStr := `
-[[device."dora"]]
+[device."dora"]
     type = "serial"
     broker = "sango"
     qos = 1
@@ -51,7 +51,7 @@ func TestNewSerialDeviceNotSetSize(t *testing.T) {
 	assert := assert.New(t)
 
 	configStr := `
-[[device."dora"]]
+[device."dora"]
     type = "serial"
     broker = "sango"
     qos = 1
@@ -73,7 +73,7 @@ func TestNewSerialDeviceInvalidInterval(t *testing.T) {
 	assert := assert.New(t)
 
 	configStr := `
-[[device."dora"]]
+[device."dora"]
     type = "serial"
     broker = "sango"
     interval = -1
@@ -90,7 +90,7 @@ func TestNewSerialDeviceInvalidQoS(t *testing.T) {
 	assert := assert.New(t)
 
 	configStr := `
-[[device."dora"]]
+[device."dora"]
     type = "serial"
     broker = "sango"
     qos = -1
@@ -106,7 +106,7 @@ func TestNewSerialDeviceInvalidBroker(t *testing.T) {
 	assert := assert.New(t)
 
 	configStr := `
-[[device."dora"]]
+[device."dora"]
     type = "serial"
     broker = "doesNotExist"
     qos = 1
@@ -122,7 +122,7 @@ func TestNewSerialDeviceInvalidBaud(t *testing.T) {
 	assert := assert.New(t)
 
 	configStr := `
-[[device."dora"]]
+[device."dora"]
     type = "serial"
     broker = "sango"
     qos = -1

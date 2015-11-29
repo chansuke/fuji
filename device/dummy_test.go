@@ -27,7 +27,7 @@ func TestNewDummyDevice(t *testing.T) {
 	assert := assert.New(t)
 
 	configStr := `
-[[device."dora/dummy"]]
+[device."dora/dummy"]
     broker = "sango"
     qos = 1
     dummy = true
@@ -51,7 +51,7 @@ func TestNewDummyDeviceInvalidInterval(t *testing.T) {
 	assert := assert.New(t)
 
 	configStr := `
-[[device."dora/dummy"]]
+[device."dora/dummy"]
     broker = "sango"
     interval = -1
     qos = 1
@@ -68,7 +68,7 @@ func TestNewDummyDeviceInvalidQoS(t *testing.T) {
 	assert := assert.New(t)
 
 	configStr := `
-[[device."dora/dummy"]]
+[device."dora/dummy"]
     broker = "sango"
     interval = -1
     qos = -1
@@ -85,7 +85,7 @@ func TestNewDummyDeviceInvalidBroker(t *testing.T) {
 	assert := assert.New(t)
 
 	configStr := `
-[[device."dora/dummy"]]
+[device."dora/dummy"]
     broker = "doesNotExist"
     interval = 10
     qos = 1

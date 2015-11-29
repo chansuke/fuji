@@ -42,7 +42,7 @@ func TestWillJustPublish(t *testing.T) {
 	    host = "localhost"
 	    port = 1883
 	    will_message = "no letter is good letter."
-	[[device."dora"]]
+	[device."dora"]
 	    type = "dummy"
 	    broker = "local"
 	    qos = 0
@@ -73,7 +73,7 @@ func TestWillSubscribePublishClose(t *testing.T) {
 	    host = "localhost"
 	    port = 1883
 	    will_message = "good letter is no letter."
-	[[device."dora"]]
+	[device."dora"]
 	    type = "dummy"
 	    broker = "local"
 	    qos = 0
@@ -97,7 +97,7 @@ func TestWillSubscribePublishCloseEmpty(t *testing.T) {
 	    host = "localhost"
 	    port = 1883
 	    will_message = ""
-	[[device."dora"]]
+	[device."dora"]
 	    type = "dummy"
 	    broker = "local"
 	    qos = 0
@@ -118,7 +118,7 @@ func TestWillSubscribePublishBinaryWill(t *testing.T) {
 	    host = "localhost"
 	    port = 1883
 	    will_message = "\\x01\\x02"
-	[[device."dora"]]
+	[device."dora"]
 	    type = "dummy"
 	    broker = "local"
 	    qos = 0

@@ -124,7 +124,7 @@ func addStatusSections(configSections []ConfigSection, statusSectionMap SectionM
 	return configSections
 }
 
-func addConfigSections(configSections []ConfigSection, title string, sectionMap SectionMap) []ConfigSection {
+func addMultipleSections(configSections []ConfigSection, title string, sectionMap SectionMap) []ConfigSection {
 	for name, values := range sectionMap {
 		t := strings.Split(name, "/")
 		if len(t) > 2 {
@@ -145,6 +145,49 @@ func addConfigSections(configSections []ConfigSection, title string, sectionMap 
 				default:
 					valueMap[k] = v.(string)
 				}
+			}
+		}
+
+		if len(valueMap) == 0 {
+			continue
+		}
+
+		rt := ConfigSection{
+			Title:  title,
+			Type:   title,
+			Name:   t[0],
+			Values: valueMap,
+		}
+
+		if len(t) == 2 { // if args exists, store it
+			rt.Arg = t[1]
+		}
+
+		configSections = append(configSections, rt)
+	}
+
+	return configSections
+}
+
+func addUniqueSections(configSections []ConfigSection, title string, sectionMap SectionMap) []ConfigSection {
+	for name, values := range sectionMap {
+		t := strings.Split(name, "/")
+		if len(t) > 2 {
+			log.Errorf("invalid section(slash), %v", t)
+			continue
+		}
+
+		values_ := values.(map[string]interface{})
+		valueMap := make(map[string]string)
+
+		for k, v := range values_ {
+			switch v.(type) {
+			case int64:
+				valueMap[k] = strconv.FormatInt(v.(int64), 10)
+			case bool:
+				valueMap[k] = strconv.FormatBool(v.(bool))
+			default:
+				valueMap[k] = v.(string)
 			}
 		}
 
@@ -215,10 +258,10 @@ func LoadConfigByte(conf []byte) (Config, error) {
 	sections = addStatusSections(sections, configToml.Status)
 
 	// broker sections
-	sections = addConfigSections(sections, "broker", configToml.Brokers)
+	sections = addMultipleSections(sections, "broker", configToml.Brokers)
 
 	// device sections
-	sections = addConfigSections(sections, "device", configToml.Devices)
+	sections = addUniqueSections(sections, "device", configToml.Devices)
 
 	// broker names
 	for name, _ := range configToml.Brokers {
