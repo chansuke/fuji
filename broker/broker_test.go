@@ -173,6 +173,35 @@ func TestBrokerValidationWill(t *testing.T) {
 	assert.Equal([]byte{1, 15}, b[0].WillMessage)
 }
 
+func TestBrokerValidationTls(t *testing.T) {
+	assert := assert.New(t)
+
+	// check broker validation
+	configStr := `
+	[[broker."sango/1"]]
+   host = "localhost"
+   port = 8883
+   tls = true
+   cacert = "../tests/mosquitto/ca.pem"
+`
+	conf, err := config.LoadConfigByte([]byte(configStr))
+	b, err := NewBrokers(conf, make(chan message.Message))
+	assert.Nil(err)
+	assert.Equal(1, len(b))
+
+	// check broker validation fail if cacert is missing
+	configStr = `
+	[[broker."sango/1"]]
+    host = "localhost"
+    port = 8883
+    tls = true
+`
+	conf, err = config.LoadConfigByte([]byte(configStr))
+	assert.Nil(err)
+	b, err = NewBrokers(conf, make(chan message.Message))
+	assert.NotNil(err)
+}
+
 func TestGenerateTopic(t *testing.T) {
 	assert := assert.New(t)
 	b := &Broker{
