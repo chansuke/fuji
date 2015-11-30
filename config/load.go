@@ -169,13 +169,23 @@ func addConfigSections(configSections []ConfigSection, title string, sectionMap 
 		}
 
 		var valueMap map[string]string
-		switch title {
-		case "device":
+
+		switch values.(type) {
+		case map[string]interface{}:
+			if title == "broker" {
+				log.Errorf("invalid broker section. not [broker.\"%s\"] but [[broker.\"%s\"]]", name, name)
+				continue
+			}
 			valueMap = buildUniqueValueMap(values.(map[string]interface{}))
-		case "broker":
+		case []map[string]interface{}:
+			if title == "device" {
+				log.Errorf("invalid device section. not [[device.\"%s\"]] but [device.\"%s\"]", name, name)
+				continue
+			}
 			valueMap = buildMultipleValueMap(values.([]map[string]interface{}))
 		default:
-			valueMap = buildMultipleValueMap(values.([]map[string]interface{}))
+			log.Errorf("valid section not found", name)
+			continue
 		}
 
 		if len(valueMap) == 0 {
