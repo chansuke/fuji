@@ -293,6 +293,8 @@ func setupWillSubscriber(gw *gateway.Gateway, broker *broker.Broker) (chan MQTT.
 	opts.SetDefaultPublishHandler(func(client *MQTT.Client, msg MQTT.Message) {
 		messageOutputChannel <- msg
 	})
+	willQoS := 0
+        willTopic := broker.WillTopic
 
 	client := MQTT.NewClient(opts)
 	if client == nil {
@@ -302,9 +304,7 @@ func setupWillSubscriber(gw *gateway.Gateway, broker *broker.Broker) (chan MQTT.
 		return nil, config.Error(fmt.Sprintf("NewClient Start failed %q", token.Error()))
 	}
 
-	qos := 0
-	willTopic := fmt.Sprintf("%s/%s/will", broker.TopicPrefix, gw.Name)
-	client.Subscribe(willTopic, byte(qos), func(client *MQTT.Client, msg MQTT.Message) {
+	client.Subscribe(willTopic, byte(willQoS), func(client *MQTT.Client, msg MQTT.Message) {
 		messageOutputChannel <- msg
 	})
 
