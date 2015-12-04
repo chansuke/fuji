@@ -294,7 +294,7 @@ func setupWillSubscriber(gw *gateway.Gateway, broker *broker.Broker) (chan MQTT.
 		messageOutputChannel <- msg
 	})
 	willQoS := 0
-        willTopic := broker.WillTopic
+	willTopic := broker.WillTopic
 
 	client := MQTT.NewClient(opts)
 	if client == nil {
