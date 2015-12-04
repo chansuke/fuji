@@ -82,7 +82,7 @@ func TestWillWithPrefixSubscribePublishClose(t *testing.T) {
 	    payload = "Hello will with prefix."
 `
 	expectedWill := true
-	ok := genericWillTestDriver(t, configStr, "prefix/testprefixwill/will", []byte("Hello will with prefix."), expectedWill)
+	ok := genericWillTestDriver(t, configStr, "prefix/testprefixwill/will", []byte("no letter is good letter."), expectedWill)
 	assert.True(ok, "Failed to receive Will with prefix message")
 }
 
