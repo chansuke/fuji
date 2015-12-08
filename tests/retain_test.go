@@ -118,7 +118,7 @@ func TestNoRetainSubscribePublishClose(t *testing.T) {
 	    host = "localhost"
 	    port = 1883
 	
-	[[device."dora"]]
+	[device."dora"]
 	
 	    type = "dummy"
 	    broker = "local"

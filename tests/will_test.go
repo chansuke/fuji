@@ -74,7 +74,7 @@ func TestWillWithPrefixSubscribePublishClose(t *testing.T) {
 	    port = 1883
 	    will_message = "no letter is good letter."
 	    topic_prefix = "prefix"
-	[[device."dora"]]
+	[device."dora"]
 	    type = "dummy"
 	    broker = "local"
 	    qos = 0
@@ -100,7 +100,7 @@ func TestNoWillSubscribePublishClose(t *testing.T) {
 	[[broker."local/1"]]
 	    host = "localhost"
 	    port = 1883
-	[[device."dora"]]
+	[device."dora"]
 	    type = "dummy"
 	    broker = "local"
 	    qos = 0
