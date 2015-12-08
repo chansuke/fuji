@@ -46,7 +46,7 @@ var tlsClientCertconfigStr = `
     retry_interval = 10
 
 
-[[device."dora"]]
+[device."dora"]
     type = "dummy"
 
     broker = "mosquitto"

@@ -108,7 +108,7 @@ func TestNoWillSubscribePublishClose(t *testing.T) {
 	    payload = "Hello will just publish world."
 `
 	expectedWill := false
-	ok := genericWillTestDriver(t, configStr, "testnowillafterclose/will", []byte(""), expectedWill)
+	ok := genericWillTestDriver(t, configStr, "/testnowillafterclose/will", []byte(""), expectedWill)
 	assert.True(ok, "Failed to receive Will message")
 }
 
