@@ -23,6 +23,42 @@ import (
 	"strings"
 )
 
+func buildUniqueValueMap(values map[string]interface{}) map[string]string {
+	valueMap := make(map[string]string)
+
+	for k, v := range values {
+		switch v.(type) {
+		case int64:
+			valueMap[k] = strconv.FormatInt(v.(int64), 10)
+		case bool:
+			valueMap[k] = strconv.FormatBool(v.(bool))
+		default:
+			valueMap[k] = v.(string)
+		}
+	}
+
+	return valueMap
+}
+
+func buildMultipleValueMap(values []map[string]interface{}) map[string]string {
+	valueMap := make(map[string]string)
+
+	for _, m := range values {
+		for k, v := range m {
+			switch v.(type) {
+			case int64:
+				valueMap[k] = strconv.FormatInt(v.(int64), 10)
+			case bool:
+				valueMap[k] = strconv.FormatBool(v.(bool))
+			default:
+				valueMap[k] = v.(string)
+			}
+		}
+	}
+
+	return valueMap
+}
+
 func getGatewayName(gatewaySectionMap SectionMap) (string, error) {
 	for name, value := range gatewaySectionMap {
 		if name == "name" {
@@ -132,20 +168,24 @@ func addConfigSections(configSections []ConfigSection, title string, sectionMap 
 			continue
 		}
 
-		values_ := values.([]map[string]interface{})
-		valueMap := make(map[string]string)
+		var valueMap map[string]string
 
-		for _, m := range values_ {
-			for k, v := range m {
-				switch v.(type) {
-				case int64:
-					valueMap[k] = strconv.FormatInt(v.(int64), 10)
-				case bool:
-					valueMap[k] = strconv.FormatBool(v.(bool))
-				default:
-					valueMap[k] = v.(string)
-				}
+		switch values.(type) {
+		case map[string]interface{}:
+			if title == "broker" {
+				log.Errorf("invalid broker section. not [broker.\"%s\"] but [[broker.\"%s\"]]", name, name)
+				continue
 			}
+			valueMap = buildUniqueValueMap(values.(map[string]interface{}))
+		case []map[string]interface{}:
+			if title == "device" {
+				log.Errorf("invalid device section. not [[device.\"%s\"]] but [device.\"%s\"]", name, name)
+				continue
+			}
+			valueMap = buildMultipleValueMap(values.([]map[string]interface{}))
+		default:
+			log.Errorf("valid section not found", name)
+			continue
 		}
 
 		if len(valueMap) == 0 {

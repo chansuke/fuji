@@ -43,7 +43,7 @@ var serialDeviceTestcases = []iniRetainTestCase{
 		host = "localhost"
 		port = 1883
 
-		[[device."hi"]]
+		[device."hi"]
 		type = "serial"
 		broker = "sango"
 		serial = "/dev/tty"
@@ -59,7 +59,7 @@ var serialDeviceTestcases = []iniRetainTestCase{
 		host = "localhost"
 		port = 1883
 
-		[[device."hi"]]
+		[device."hi"]
 		type = "serial"
 		broker = "sango"
 		serial = "/dev/tty"
@@ -76,7 +76,7 @@ var serialDeviceTestcases = []iniRetainTestCase{
 		host = "localhost"
 		port = 1883
 
-		[[device."hi"]]
+		[device."hi"]
 		type = "serial"
 		broker = "sango"
 		serial = "/dev/tty"
@@ -96,7 +96,7 @@ var dummyDeviceTestcases = []iniRetainTestCase{
 		host = "localhost"
 		port = 1883
 
-		[[device."hi"]]
+		[device."hi"]
 		type = "dummy"
 		broker = "sango"
 		qos = 0
@@ -112,7 +112,7 @@ var dummyDeviceTestcases = []iniRetainTestCase{
 		host = "localhost"
 		port = 1883
 
-		[[device."hi"]]
+		[device."hi"]
 		type = "dummy"
 		broker = "sango"
 		qos = 0
@@ -129,7 +129,7 @@ var dummyDeviceTestcases = []iniRetainTestCase{
 		host = "localhost"
 		port = 1883
 
-                [[device."hi"]]
+                [device."hi"]
 		type = "dummy"
 		broker = "sango"
 		qos = 0
