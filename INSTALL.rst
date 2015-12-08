@@ -140,7 +140,7 @@ Since all user can use only topic under `<username>/#` on the Sango, set `topic_
         topic_prefix = "<sango username>"
     
     
-    [[device."test/dummy"]]
+    [device."test/dummy"]
     
         broker = "sango"
         qos = 0
@@ -185,7 +185,7 @@ This example is set like below.
         topic_prefix = "shiguredo@github"
     
     
-    [[device."test/dummy"]]
+    [device."test/dummy"]
     
         broker = "sango"
         qos = 0

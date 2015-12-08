@@ -17,7 +17,7 @@
     topic_prefix = "sometextforprefix"
 
 
-[[device."dora/dummy"]]
+[device."dora/dummy"]
 
     broker = "sango"
     qos = 0

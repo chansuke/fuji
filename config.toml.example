@@ -23,7 +23,7 @@
     username = "fuji-gw"
     password = "456"
 
-[[device."spam"]]
+[device."spam"]
     type = "serial"
     broker = "sango"
     qos = 0
@@ -32,7 +32,7 @@
     baud = 9600
     size = 4
 
-[[device."beacon"]]
+[device."beacon"]
     type = "serial"
     broker = "sango"
     qos = 2
@@ -41,7 +41,7 @@
     baud = 115200
     size = 8
 
-[[device."dora"]]
+[device."dora"]
     type = "dummy"
     broker = "akane"
     qos = 2

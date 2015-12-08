@@ -45,7 +45,7 @@ func TestRetainJustPublish(t *testing.T) {
 	    host = "localhost"
 	    port = 1883
 	
-	[[device."doraretain"]]
+	[device."doraretain"]
 	
 	    type = "dummy"
 	    broker = "local"
@@ -83,7 +83,7 @@ func TestRetainSubscribePublishClose(t *testing.T) {
 	    host = "localhost"
 	    port = 1883
 	
-	[[device."dora"]]
+	[device."dora"]
 	
 	    type = "dummy"
 	    broker = "local"
