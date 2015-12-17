@@ -25,10 +25,10 @@ import (
 	"github.com/shiguredo/fuji/message"
 )
 
-// configRetainTestCase はRetain機能のテストの条件を示すデータ型です。
-// configString は設定ファイルの内容
-// expectedError はテストを実行したときに期待されるエラーの状態
-// message はテストが失敗した内容の説明
+// configRetainTestCase indicates a condition for testing Retain.
+// configString is the body of configuration file.
+// expectedError is the expected error state when the test is executed.
+// message is the detail of test failure.
 type configRetainTestCase struct {
 	configStr     string
 	expectedError config.AnyError
