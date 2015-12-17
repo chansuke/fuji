@@ -27,7 +27,7 @@ import (
 func Start(configPath string) {
 	conf, err := config.LoadConfig(configPath)
 	if err != nil {
-		log.Fatalf("loading ini file faild, %v", err)
+		log.Fatalf("loading config file faild, %v", err)
 	}
 
 	commandChannel := make(chan string)
