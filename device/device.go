@@ -29,7 +29,7 @@ type Devicer interface {
 	AddSubscribe() error
 }
 
-// NewDevices is a factory method to create various kind of devices from ini.File
+// NewDevices is a factory method to create various kind of devices from config.Config
 func NewDevices(conf config.Config, brokers []*broker.Broker) ([]Devicer, []DeviceChannel, error) {
 	var ret []Devicer
 	var devChannels []DeviceChannel

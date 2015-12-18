@@ -142,7 +142,7 @@ func (m MemoryStatus) Get() []message.Message {
 	return ret
 }
 
-// NewStatus returnes status from ini File, not ini.Section.
+// NewStatus returnes status from config file, not config.Sections.
 func NewStatus(conf config.Config) (Devicer, error) {
 	ret := Status{
 		Name:        "status",

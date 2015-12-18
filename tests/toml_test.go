@@ -26,14 +26,14 @@ import (
 	"github.com/shiguredo/fuji/message"
 )
 
-func TestIniLoadini(t *testing.T) {
+func TestLoadConfig(t *testing.T) {
 	assert := assert.New(t)
 
 	_, err := config.LoadConfig("testing_conf.toml")
 	assert.Nil(err)
 }
 
-func TestIniNewGateway(t *testing.T) {
+func TestNewGateway(t *testing.T) {
 	assert := assert.New(t)
 
 	conf, err := config.LoadConfig("testing_conf.toml")
@@ -43,7 +43,7 @@ func TestIniNewGateway(t *testing.T) {
 	assert.Equal("ham", gw.Name)
 }
 
-func TestIniNewBrokers(t *testing.T) {
+func TestNewBrokers(t *testing.T) {
 	assert := assert.New(t)
 
 	conf, err := config.LoadConfig("testing_conf.toml")
@@ -53,7 +53,7 @@ func TestIniNewBrokers(t *testing.T) {
 	assert.Equal(3, len(brokerList))
 }
 
-func TestIniNewSerialDevices(t *testing.T) {
+func TestNewSerialDevices(t *testing.T) {
 	assert := assert.New(t)
 
 	conf, err := config.LoadConfig("testing_conf.toml")
@@ -64,7 +64,7 @@ func TestIniNewSerialDevices(t *testing.T) {
 	assert.Equal(3, len(deviceList))
 }
 
-func TestIniNewDummyDevice(t *testing.T) {
+func TestNewDummyDevice(t *testing.T) {
 	assert := assert.New(t)
 
 	conf, err := config.LoadConfig("testing_conf.toml")

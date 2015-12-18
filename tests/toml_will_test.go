@@ -24,13 +24,13 @@ import (
 	"github.com/shiguredo/fuji/message"
 )
 
-type iniWillTestCase struct {
+type configWillTestCase struct {
 	configStr     string          // testcase config file
 	expectedError config.AnyError // expected error status
 	message       string          // message when failed
 }
 
-var testcases = []iniWillTestCase{
+var testcases = []configWillTestCase{
 	// tests broker validation without will_message
 	{
 		configStr: `
@@ -98,7 +98,7 @@ var testcases = []iniWillTestCase{
 		message:       "WillMessage could not be defined for both of two."},
 }
 
-func generalIniWillTest(test iniWillTestCase, t *testing.T) {
+func generalConfigWillTest(test configWillTestCase, t *testing.T) {
 	assert := assert.New(t)
 
 	conf, err := config.LoadConfigByte([]byte(test.configStr))
@@ -109,8 +109,8 @@ func generalIniWillTest(test iniWillTestCase, t *testing.T) {
 	assert.NotEqual(0, len(brokers))
 }
 
-func TestIniWillAll(t *testing.T) {
+func TestConfigWillAll(t *testing.T) {
 	for _, testcase := range testcases {
-		generalIniWillTest(testcase, t)
+		generalConfigWillTest(testcase, t)
 	}
 }
