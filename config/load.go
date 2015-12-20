@@ -212,9 +212,9 @@ func addConfigSections(configSections []ConfigSection, title string, sectionMap 
 // LoadConfig loads toml format file from confPath arg and returns []ConfigSection.
 // ConfigSection has a Type, Name and arg.
 // example:
-// [broker."sango"]
-// [broker."sango/1"]
-// [broker."sango/2"]
+// [[broker."sango"]]
+// [[broker."sango/1"]]
+// [[broker."sango/2"]]
 //
 // ret = [
 //   ConfigSection{Type: "broker", Name: "sango"},
