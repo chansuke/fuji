@@ -17,7 +17,6 @@ package config
 import (
 	"fmt"
 	"github.com/BurntSushi/toml"
-	log "github.com/Sirupsen/logrus"
 	"io/ioutil"
 	"strconv"
 	"strings"
@@ -160,12 +159,11 @@ func addStatusSections(configSections []ConfigSection, statusSectionMap SectionM
 	return configSections
 }
 
-func addConfigSections(configSections []ConfigSection, title string, sectionMap SectionMap) []ConfigSection {
+func addConfigSections(configSections []ConfigSection, title string, sectionMap SectionMap) ([]ConfigSection, error) {
 	for name, values := range sectionMap {
 		t := strings.Split(name, "/")
 		if len(t) > 2 {
-			log.Errorf("invalid section(slash), %v", t)
-			continue
+			return configSections, fmt.Errorf("invalid section(slash), %v", t)
 		}
 
 		var valueMap map[string]string
@@ -173,19 +171,18 @@ func addConfigSections(configSections []ConfigSection, title string, sectionMap 
 		switch values.(type) {
 		case map[string]interface{}:
 			if title == "broker" {
-				log.Errorf("invalid broker section. not [broker.\"%s\"] but [[broker.\"%s\"]]", name, name)
-				continue
+				msgFmt := "invalid broker section. not [broker.\"%s\"] but [[broker.\"%s\"]]"
+				return configSections, fmt.Errorf(msgFmt, name, name)
 			}
 			valueMap = buildUniqueValueMap(values.(map[string]interface{}))
 		case []map[string]interface{}:
 			if title == "device" {
-				log.Errorf("invalid device section. not [[device.\"%s\"]] but [device.\"%s\"]", name, name)
-				continue
+				msgFmt := "invalid device section. not [[device.\"%s\"]] but [device.\"%s\"]"
+				return configSections, fmt.Errorf(msgFmt, name, name)
 			}
 			valueMap = buildMultipleValueMap(values.([]map[string]interface{}))
 		default:
-			log.Errorf("valid section not found", name)
-			continue
+			return configSections, fmt.Errorf("valid section not found", name)
 		}
 
 		if len(valueMap) == 0 {
@@ -206,7 +203,7 @@ func addConfigSections(configSections []ConfigSection, title string, sectionMap 
 		configSections = append(configSections, rt)
 	}
 
-	return configSections
+	return configSections, nil
 }
 
 // LoadConfig loads toml format file from confPath arg and returns []ConfigSection.
@@ -255,10 +252,16 @@ func LoadConfigByte(conf []byte) (Config, error) {
 	sections = addStatusSections(sections, configToml.Status)
 
 	// broker sections
-	sections = addConfigSections(sections, "broker", configToml.Brokers)
+	sections, err = addConfigSections(sections, "broker", configToml.Brokers)
+	if err != nil {
+		return config, err
+	}
 
 	// device sections
-	sections = addConfigSections(sections, "device", configToml.Devices)
+	sections, err = addConfigSections(sections, "device", configToml.Devices)
+	if err != nil {
+		return config, err
+	}
 
 	// broker names
 	for name, _ := range configToml.Brokers {
