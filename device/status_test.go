@@ -83,3 +83,13 @@ func TestMemoryGet(t *testing.T) {
 	msgs := c.Get()
 	assert.Equal(4, len(msgs))
 }
+
+func TestIpAddressGet(t *testing.T) {
+	assert := assert.New(t)
+
+	i := IpAddressStatus{
+		Interfaces: []string{"all"},
+	}
+	msgs := i.Get()
+	assert.NotNil(i)
+}

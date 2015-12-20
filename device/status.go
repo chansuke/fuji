@@ -15,7 +15,9 @@
 package device
 
 import (
+	"encoding/json"
 	"fmt"
+	"net"
 	"strconv"
 	"strings"
 	"time"
@@ -39,6 +41,11 @@ type MemoryStatus struct {
 	BrokerName    string
 	VirtualMemory []string
 }
+type IpAddressStatus struct {
+	GatewayName string
+	BrokerName  string
+	Interfaces  []string
+}
 type Status struct {
 	Name        string `validate:"max=256,regexp=[^/]+,validtopic"`
 	GatewayName string
@@ -46,6 +53,7 @@ type Status struct {
 	Interval    int
 	CPU         CPUStatus
 	Memory      MemoryStatus
+	IpAddress   IpAddressStatus
 }
 
 func (device Status) String() string {
@@ -142,6 +150,35 @@ func (m MemoryStatus) Get() []message.Message {
 	return ret
 }
 
+func (i IpAddressStatus) Get() []message.Message {
+	ret := []message.Message{}
+
+	addresses, err := net.Interfaces()
+	if err == nil {
+		msg := message.Message{
+			Sender:     "status",
+			Type:       "status",
+			BrokerName: i.BrokerName,
+		}
+		body, err := json.Marshal(addresses)
+		if err != nil {
+			log.Errorf("json encode error %s", err)
+		}
+		msg.Body = []byte(body)
+
+		topic, err := genTopic(i.GatewayName, "ip_address", "interface", "all")
+		if err != nil {
+			log.Errorf("invalid topic, %s/%s/%s/%s", i.GatewayName, "ip_address", "interface", "all")
+		}
+		msg.Topic = topic
+
+		ret = append(ret, msg)
+	} else {
+		log.Warnf("ip_address get err, %v", err)
+	}
+	return ret
+}
+
 // NewStatus returnes status from config file, not config.Sections.
 func NewStatus(conf config.Config) (Devicer, error) {
 	ret := Status{
@@ -208,6 +245,18 @@ func NewStatus(conf config.Config) (Devicer, error) {
 				mem.VirtualMemory = virtual_memory
 			}
 			ret.Memory = mem
+
+		case "ip_address":
+			interfaces := parseStatus(section.Values["ip_address"])
+
+			ip_address := IpAddressStatus{
+				GatewayName: conf.GatewayName,
+				BrokerName:  ret.BrokerName,
+			}
+			if len(interfaces) > 0 {
+				ip_address.Interfaces = interfaces
+			}
+			ret.IpAddress = ip_address
 		default:
 			log.Errorf("unknown status type: %v", section.Name)
 			continue
@@ -243,6 +292,7 @@ func (device Status) Start(channel chan message.Message) error {
 
 			msgs = append(msgs, device.CPU.Get()...)
 			msgs = append(msgs, device.Memory.Get()...)
+			msgs = append(msgs, device.IpAddress.Get()...)
 			if len(msgs) > 0 {
 				for _, msg := range msgs {
 					channel <- msg
