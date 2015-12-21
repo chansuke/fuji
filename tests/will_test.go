@@ -109,7 +109,7 @@ func TestNoWillSubscribePublishClose(t *testing.T) {
 `
 	expectedWill := false
 	ok := genericWillTestDriver(t, configStr, "/testnowillafterclose/will", []byte(""), expectedWill)
-	assert.True(ok, "Failed to receive Will message")
+	assert.False(ok, "Failed to receive Will message")
 }
 
 // TestWillSubscribePublishClose
@@ -243,21 +243,16 @@ func genericWillTestDriver(t *testing.T, configStr string, expectedTopic string,
 	brokers, err := broker.NewBrokers(conf, gw.BrokerChan)
 	assert.Nil(err)
 
+	subscriberChannel, err := setupWillSubscriber(gw, brokers[0])
+	if err != config.Error("") {
+		t.Error(err)
+	}
+
+	fin := make(chan bool)
+
 	go func() {
-		time.Sleep(1 * time.Second)
-
-		subscriberChannel, err := setupWillSubscriber(gw, brokers[0])
-		if err != config.Error("") {
-			t.Error(err)
-		}
-
-		time.Sleep(1 * time.Second)
-
-		// kill publisher
-		brokers[0].FourceClose()
-		fmt.Println("broker killed for getting will message")
-
 		// check will message
+		willCame := true
 		select {
 		case willMsg := <-subscriberChannel:
 			if expectedWill {
@@ -271,11 +266,16 @@ func genericWillTestDriver(t *testing.T, configStr string, expectedTopic string,
 			if expectedWill {
 				assert.Equal("will message received within 1 sec", "not completed")
 			}
+			willCame = false
 		}
-
+		fin <- willCame
 	}()
-	time.Sleep(3 * time.Second)
-	ok = true
+
+	// kill publisher
+	brokers[0].FourceClose()
+	fmt.Println("broker killed for getting will message")
+
+	ok = <-fin
 	return ok
 }
 
