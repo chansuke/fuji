@@ -106,6 +106,9 @@ func NewTLSConfig(b *Broker) (*tls.Config, error) {
 		InsecureSkipVerify: true,
 	}
 	if b.ClientCert != "" {
+		if b.ClientKey == "" {
+			return nil, config.Error("Client certificate requires private key")
+		}
 		// client certificate also checked
 		cert, err := tls.LoadX509KeyPair(b.ClientCert, b.ClientKey)
 		if err != nil {
