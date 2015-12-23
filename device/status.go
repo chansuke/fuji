@@ -168,30 +168,47 @@ func (i IpAddressStatus) Get() []message.Message {
 			Type:       "status",
 			BrokerName: i.BrokerName,
 		}
-
-		addressList := []InterfaceAddress{}
-
-		for _, intf := range ifs {
-			addrs, err := intf.Addrs()
+		body := []byte{}
+		if name == "all" {
+			addressList := []InterfaceAddress{}
+			for _, intf := range ifs {
+				addrs, err := intf.Addrs()
+				if err != nil {
+					log.Errorf("interface Addrs error %s", err)
+					continue
+				}
+				addrStrList := []string{}
+				for _, a := range addrs {
+					addrStrList = append(addrStrList, a.String())
+				}
+				addressList = append(addressList, InterfaceAddress{
+					Name: intf.Name,
+					Addr: addrStrList})
+			}
+			body, err = json.Marshal(addressList)
 			if err != nil {
-				log.Errorf("interface Addrs error %s", err)
-				continue
+				log.Errorf("json encode error %s", err)
 			}
-			if (name != "all") && (name != intf.Name) {
-				continue
-			}
-			fmt.Printf("name: %s intf: %s", name, intf.Name)
+		} else {
 			addrStrList := []string{}
-			for _, a := range addrs {
-				addrStrList = append(addrStrList, a.String())
+			for _, intf := range ifs {
+				if name != intf.Name {
+					continue
+				}
+				addrs, err := intf.Addrs()
+				if err != nil {
+					log.Errorf("interface Addrs error %s", err)
+					continue
+				}
+				for _, a := range addrs {
+					addrStrList = append(addrStrList, a.String())
+				}
+				break
 			}
-			addressList = append(addressList, InterfaceAddress{
-				Name: intf.Name,
-				Addr: addrStrList})
-		}
-		body, err := json.Marshal(addressList)
-		if err != nil {
-			log.Errorf("json encode error %s", err)
+			body, err = json.Marshal(addrStrList)
+			if err != nil {
+				log.Errorf("json encode error %s", err)
+			}
 		}
 		msg.Body = []byte(body)
 
