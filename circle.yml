@@ -32,6 +32,8 @@ test:
     - docker run -d -p 1883:1883 -p 8883:8883 -p 9883:9883 -p 8080:8080 -v /home/ubuntu/.go_workspace/src/github.com/shiguredo/fuji/tests/mosquitto:/mosquitto --name fuji-test-mosquitto shiguredo/mosquitto ; sleep 20
     - godep go build:
         pwd: ../.go_workspace/src/${REPO_PATH}
+    - make build:
+        pwd: ../.go_workspace/src/${REPO_PATH}
     - godep go test -coverpkg github.com/shiguredo/fuji ./...:
         pwd: ../.go_workspace/src/${REPO_PATH}
   post:
