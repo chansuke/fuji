@@ -162,31 +162,25 @@ func (i IpAddressStatus) Get() []message.Message {
 		log.Warnf("ip_address get err, %v", err)
 		return nil
 	}
-	msg := message.Message{
-		Sender:     "status",
-		Type:       "status",
-		BrokerName: i.BrokerName,
-	}
-	addressList := []InterfaceAddress{}
-	for _, intf := range ifs {
-		addrs, err := intf.Addrs()
-		if err != nil {
-			log.Errorf("interface Addrs error %s", err)
+	for _, name := range i.Interfaces {
+		msg := message.Message{
+			Sender:     "status",
+			Type:       "status",
+			BrokerName: i.BrokerName,
 		}
-		isIn := false
-		if len(i.Interfaces) <= 0 {
-			break
-		}
-		if i.Interfaces[0] == "all" {
-			isIn = true
-		}
-		for _, name := range i.Interfaces {
-			if name == intf.Name {
-				isIn = true
-				break
+
+		addressList := []InterfaceAddress{}
+
+		for _, intf := range ifs {
+			addrs, err := intf.Addrs()
+			if err != nil {
+				log.Errorf("interface Addrs error %s", err)
+				continue
 			}
-		}
-		if isIn {
+			if (name != "all") && (name != intf.Name) {
+				continue
+			}
+			fmt.Printf("name: %s intf: %s", name, intf.Name)
 			addrStrList := []string{}
 			for _, a := range addrs {
 				addrStrList = append(addrStrList, a.String())
@@ -195,20 +189,19 @@ func (i IpAddressStatus) Get() []message.Message {
 				Name: intf.Name,
 				Addr: addrStrList})
 		}
-	}
-	body, err := json.Marshal(addressList)
-	if err != nil {
-		log.Errorf("json encode error %s", err)
-	}
-	msg.Body = []byte(body)
+		body, err := json.Marshal(addressList)
+		if err != nil {
+			log.Errorf("json encode error %s", err)
+		}
+		msg.Body = []byte(body)
 
-	topic, err := genTopic(i.GatewayName, "ip_address", "interface", "all")
-	if err != nil {
-		log.Errorf("invalid topic, %s/%s/%s/%s", i.GatewayName, "ip_address", "interface", "all")
+		topic, err := genTopic(i.GatewayName, "ip_address", "interface", name)
+		if err != nil {
+			log.Errorf("invalid topic, %s/%s/%s/%s", i.GatewayName, "ip_address", "interface", "all")
+		}
+		msg.Topic = topic
+		ret = append(ret, msg)
 	}
-	msg.Topic = topic
-
-	ret = append(ret, msg)
 	return ret
 }
 
