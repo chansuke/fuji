@@ -90,6 +90,7 @@ func TestIpAddressGet(t *testing.T) {
 	i := IpAddressStatus{
 		Interfaces: []string{"all"},
 	}
-	msgs := i.Get()
 	assert.NotNil(i)
+	msgs := i.Get()
+	assert.True(len(msgs) > 0)
 }

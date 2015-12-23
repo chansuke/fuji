@@ -41,6 +41,10 @@ type MemoryStatus struct {
 	BrokerName    string
 	VirtualMemory []string
 }
+type InterfaceAddress struct {
+	Name string
+	Addr []string
+}
 type IpAddressStatus struct {
 	GatewayName string
 	BrokerName  string
@@ -153,29 +157,58 @@ func (m MemoryStatus) Get() []message.Message {
 func (i IpAddressStatus) Get() []message.Message {
 	ret := []message.Message{}
 
-	addresses, err := net.Interfaces()
-	if err == nil {
-		msg := message.Message{
-			Sender:     "status",
-			Type:       "status",
-			BrokerName: i.BrokerName,
-		}
-		body, err := json.Marshal(addresses)
-		if err != nil {
-			log.Errorf("json encode error %s", err)
-		}
-		msg.Body = []byte(body)
-
-		topic, err := genTopic(i.GatewayName, "ip_address", "interface", "all")
-		if err != nil {
-			log.Errorf("invalid topic, %s/%s/%s/%s", i.GatewayName, "ip_address", "interface", "all")
-		}
-		msg.Topic = topic
-
-		ret = append(ret, msg)
-	} else {
+	ifs, err := net.Interfaces()
+	if err != nil {
 		log.Warnf("ip_address get err, %v", err)
+		return nil
 	}
+	msg := message.Message{
+		Sender:     "status",
+		Type:       "status",
+		BrokerName: i.BrokerName,
+	}
+	addressList := []InterfaceAddress{}
+	for _, intf := range ifs {
+		addrs, err := intf.Addrs()
+		if err != nil {
+			log.Errorf("interface Addrs error %s", err)
+		}
+		isIn := false
+		if len(i.Interfaces) <= 0 {
+			break
+		}
+		if i.Interfaces[0] == "all" {
+			isIn = true
+		}
+		for _, name := range i.Interfaces {
+			if name == intf.Name {
+				isIn = true
+				break
+			}
+		}
+		if isIn {
+			addrStrList := []string{}
+			for _, a := range addrs {
+				addrStrList = append(addrStrList, a.String())
+			}
+			addressList = append(addressList, InterfaceAddress{
+				Name: intf.Name,
+				Addr: addrStrList})
+		}
+	}
+	body, err := json.Marshal(addressList)
+	if err != nil {
+		log.Errorf("json encode error %s", err)
+	}
+	msg.Body = []byte(body)
+
+	topic, err := genTopic(i.GatewayName, "ip_address", "interface", "all")
+	if err != nil {
+		log.Errorf("invalid topic, %s/%s/%s/%s", i.GatewayName, "ip_address", "interface", "all")
+	}
+	msg.Topic = topic
+
+	ret = append(ret, msg)
 	return ret
 }
 
@@ -247,8 +280,7 @@ func NewStatus(conf config.Config) (Devicer, error) {
 			ret.Memory = mem
 
 		case "ip_address":
-			interfaces := parseStatus(section.Values["ip_address"])
-
+			interfaces := parseStatus(section.Values["interface"])
 			ip_address := IpAddressStatus{
 				GatewayName: conf.GatewayName,
 				BrokerName:  ret.BrokerName,
