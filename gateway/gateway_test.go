@@ -73,6 +73,14 @@ name = 	"na%cme"
 		_, err = NewGateway(conf)
 		assert.NotNil(err)
 	}
+	{ // empty
+		configStr := `
+[gateway]
+name = ""
+`
+		_, err := config.LoadConfigByte([]byte(configStr))
+		assert.NotNil(err)
+	}
 }
 
 func TestNewGatewayMaxRetryCount(t *testing.T) {
