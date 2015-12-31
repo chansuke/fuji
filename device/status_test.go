@@ -36,6 +36,7 @@ func TestParseStatus(t *testing.T) {
 	r = parseStatus("")
 	assert.Equal([]string{}, r)
 }
+
 func TestStatus(t *testing.T) {
 	assert := assert.New(t)
 
@@ -64,6 +65,62 @@ func TestStatus(t *testing.T) {
 	assert.Equal(8, len(st.CPU.CpuTimes))
 	assert.Equal(5, len(st.Memory.VirtualMemory))
 
+}
+
+func TestNewStatusInvalidConfig(t *testing.T) {
+	assert := assert.New(t)
+
+	{ // status is not found
+		configStr := `
+[[broker."sango"]]
+  host = "192.168.1.20"
+  port = 1033
+`
+		conf, err := config.LoadConfigByte([]byte(configStr))
+		assert.Nil(err)
+		_, err = NewStatus(conf)
+		assert.NotNil(err)
+	}
+	{ // broker is not found
+		configStr := `
+[[broker."sango"]]
+  host = "192.168.1.20"
+  port = 1033
+[status]
+  interval = 10
+`
+		conf, err := config.LoadConfigByte([]byte(configStr))
+		assert.Nil(err)
+		_, err = NewStatus(conf)
+		assert.NotNil(err)
+	}
+	{ // broker is empty
+		configStr := `
+[[broker."sango"]]
+  host = "192.168.1.20"
+  port = 1033
+[status]
+  broker = ""
+  interval = 10
+`
+		conf, err := config.LoadConfigByte([]byte(configStr))
+		assert.Nil(err)
+		_, err = NewStatus(conf)
+		assert.NotNil(err)
+	}
+	{ // interval is empty
+		configStr := `
+[[broker."sango"]]
+  host = "192.168.1.20"
+  port = 1033
+[status]
+  broker = "sango"
+`
+		conf, err := config.LoadConfigByte([]byte(configStr))
+		assert.Nil(err)
+		_, err = NewStatus(conf)
+		assert.NotNil(err)
+	}
 }
 
 func TestCPUGet(t *testing.T) {
