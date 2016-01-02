@@ -27,7 +27,7 @@ type Message struct {
 	Topic      string
 }
 
-var (
+const (
 	TypeSubscribed = "subscribed"
 )
 
