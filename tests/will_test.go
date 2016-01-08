@@ -269,7 +269,7 @@ func genericWillTestDriver(t *testing.T, configStr string, expectedTopic string,
 	brokers, err := broker.NewBrokers(conf, gw.BrokerChan)
 	assert.Nil(err)
 
-	subscriberChannel, err := setupWillSubscriber(gw, brokers[0])
+	subscriberChannel, err := setupWillSubscriber(gw, brokers[0], t)
 	if err != config.Error("") {
 		t.Error(err)
 	}
@@ -312,7 +312,7 @@ func genericWillTestDriver(t *testing.T, configStr string, expectedTopic string,
 }
 
 // setupWillSubscriber start subscriber process and returnes a channel witch can receive will message.
-func setupWillSubscriber(gw *gateway.Gateway, broker *broker.Broker) (chan MQTT.Message, config.Error) {
+func setupWillSubscriber(gw *gateway.Gateway, broker *broker.Broker, t *testing.T) (chan MQTT.Message, config.Error) {
 	// Setup MQTT pub/sub client to confirm published content.
 	//
 	messageOutputChannel := make(chan MQTT.Message)
@@ -327,7 +327,7 @@ func setupWillSubscriber(gw *gateway.Gateway, broker *broker.Broker) (chan MQTT.
 	})
 	willQoS := 0
 	willTopic := broker.WillTopic
-	fmt.Printf("expected will_topic: %s", willTopic)
+	t.Log(fmt.Sprintf("expected will_topic: %s", willTopic))
 
 	client := MQTT.NewClient(opts)
 	if client == nil {
