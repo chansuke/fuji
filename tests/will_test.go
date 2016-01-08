@@ -305,7 +305,7 @@ func genericWillTestDriver(t *testing.T, configStr string, expectedTopic string,
 	if err != nil {
 		t.Error(err)
 	}
-	fmt.Println("broker killed for getting will message")
+	t.Log("broker killed for getting will message")
 
 	ok = <-fin
 	return ok
