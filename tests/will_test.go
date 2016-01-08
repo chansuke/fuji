@@ -327,7 +327,7 @@ func setupWillSubscriber(gw *gateway.Gateway, broker *broker.Broker, t *testing.
 	})
 	willQoS := 0
 	willTopic := broker.WillTopic
-	t.Log(fmt.Sprintf("expected will_topic: %s", willTopic))
+	t.Logf("expected will_topic: %s", willTopic)
 
 	client := MQTT.NewClient(opts)
 	if client == nil {

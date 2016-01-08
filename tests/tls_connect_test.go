@@ -118,7 +118,7 @@ func TestTLSConnectLocalPubSub(t *testing.T) {
 	qos := 0
 	expectedTopic := fmt.Sprintf("/%s/%s/%s/publish", gw.Name, dummyDevice.Name, dummyDevice.Type)
 	expectedMessage := fmt.Sprintf("%s", dummyDevice.Payload)
-	t.Log(fmt.Sprintf("expetcted topic: %s\nexpected message%s", expectedTopic, expectedMessage))
+	t.Logf("expetcted topic: %s\nexpected message%s", expectedTopic, expectedMessage)
 	client.Subscribe(expectedTopic, byte(qos), func(client *MQTT.Client, msg MQTT.Message) {
 		subscriberChannel <- [2]string{msg.Topic(), string(msg.Payload())}
 	})
