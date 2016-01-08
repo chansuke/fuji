@@ -48,6 +48,8 @@ func TestStatus(t *testing.T) {
   cpu_times = "user, system, idle, nice, iowait, irq, softirq, guest"
 [[status."memory"]]
   virtual_memory = "total, available, percent, used, free"
+[[status."ip_address"]]
+  interface = "eth0, lo0"
 [status]
   broker = "sango"
   interval = 10
@@ -64,7 +66,7 @@ func TestStatus(t *testing.T) {
 
 	assert.Equal(8, len(st.CPU.CpuTimes))
 	assert.Equal(5, len(st.Memory.VirtualMemory))
-
+	assert.Equal(2, len(st.IpAddress.Interfaces))
 }
 
 func TestNewStatusInvalidConfig(t *testing.T) {
@@ -139,4 +141,26 @@ func TestMemoryGet(t *testing.T) {
 	}
 	msgs := c.Get()
 	assert.Equal(4, len(msgs))
+}
+
+func TestIpAddressAllGet(t *testing.T) {
+	assert := assert.New(t)
+
+	i := IpAddressStatus{
+		Interfaces: []string{"all"},
+	}
+	assert.NotNil(i)
+	msgs := i.Get()
+	assert.True(len(msgs) > 0)
+}
+
+func TestIpAddressLoGet(t *testing.T) {
+	assert := assert.New(t)
+
+	i := IpAddressStatus{
+		Interfaces: []string{"lo0","en0"},
+	}
+	assert.NotNil(i)
+	msgs := i.Get()
+	assert.True(len(msgs) > 0)
 }
