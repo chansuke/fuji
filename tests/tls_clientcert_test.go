@@ -29,17 +29,19 @@ import (
 	"github.com/shiguredo/fuji/gateway"
 )
 
-var configStr = `
+var tlsClientCertconfigStr = `
 [gateway]
 
-    name = "hamlocalconnect"
+    name = "tlsccerthamlocalconnect"
 
 [[broker."mosquitto/1"]]
 
     host = "localhost"
-    port = 8883
+    port = 9883
     tls = true
     cacert = "mosquitto/ca.pem"
+    client_cert = "mosquitto/client.pem"
+    client_key = "mosquitto/client.key"
 
     retry_interval = 10
 
@@ -55,10 +57,10 @@ var configStr = `
 `
 
 // TestTLSConnectLocalPub
-func TestTLSConnectLocalPub(t *testing.T) {
+func TestTLSClientCertConnectLocalPub(t *testing.T) {
 	assert := assert.New(t)
 
-	conf, err := config.LoadConfigByte([]byte(configStr))
+	conf, err := config.LoadConfigByte([]byte(tlsClientCertconfigStr))
 	assert.Nil(err)
 	commandChannel := make(chan string)
 	go fuji.StartByFileWithChannel(conf, commandChannel)
@@ -70,7 +72,7 @@ func TestTLSConnectLocalPub(t *testing.T) {
 // 1. connect gateway to local broker with TLS
 // 2. send data from dummy
 // 3. check subscribe
-func TestTLSConnectLocalPubSub(t *testing.T) {
+func TestTLSClientCertConnectLocalPubSub(t *testing.T) {
 	assert := assert.New(t)
 
 	// pub/sub test to broker on localhost
@@ -78,7 +80,7 @@ func TestTLSConnectLocalPubSub(t *testing.T) {
 	// publised messages confirmed by subscriber
 
 	// get config
-	conf, err := config.LoadConfigByte([]byte(configStr))
+	conf, err := config.LoadConfigByte([]byte(tlsClientCertconfigStr))
 	assert.Nil(err)
 
 	// get Gateway

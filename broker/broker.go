@@ -52,6 +52,8 @@ type Broker struct {
 	WillTopic     string `validate:"max=256,validtopic"`
 	Tls           bool
 	CaCert        string `validate:"max=256"`
+	ClientCert    string `validate:"max=256"`
+	ClientKey     string `validate:"max=256"`
 	TLSConfig     *tls.Config
 	Subscribed    Subscribed // list of subscribed topics
 
@@ -89,22 +91,34 @@ func NewTLSConfig(b *Broker) (*tls.Config, error) {
 	certPool := x509.NewCertPool()
 	pemCerts, err := ioutil.ReadFile(b.CaCert)
 	if err != nil {
-		return nil, config.Error("Cert File could not be read.")
+		return nil, config.Error(fmt.Sprintf("Cert File: %s could not be read.", b.CaCert))
 	}
 	appendCertOk := certPool.AppendCertsFromPEM(pemCerts)
 	if appendCertOk != true {
 		return nil, config.Error("Server Certificate parse failed")
 	}
-
-	// only server certificate checked
-	return &tls.Config{
+	ret := &tls.Config{
 		RootCAs:    certPool,
 		ClientAuth: tls.NoClientCert,
 		ClientCAs:  nil,
 		// InsecureSkipVerify = verify that cert contents
 		// match server. IP matches what is in cert etc.
 		InsecureSkipVerify: true,
-	}, nil
+	}
+	if b.ClientCert != "" {
+		if b.ClientKey == "" {
+			return nil, config.Error("Client certificate requires private key")
+		}
+		// client certificate also checked
+		cert, err := tls.LoadX509KeyPair(b.ClientCert, b.ClientKey)
+		if err != nil {
+			return nil, err
+		}
+		ret.ClientAuth = tls.RequireAndVerifyClientCert
+		ret.Certificates = []tls.Certificate{cert}
+		ret.ClientCAs = certPool
+	}
+	return ret, nil
 }
 
 // NewBrokers returns []*Broker from config.Config.
@@ -179,9 +193,18 @@ func NewBrokers(conf config.Config, gwChan chan message.Message) (Brokers, error
 			if values["cacert"] == "" {
 				return nil, fmt.Errorf("cacert must be set")
 			}
-			// validate certificate
 			broker.Tls = true
 			broker.CaCert = values["cacert"]
+
+			// check client certificate
+			if values["client_cert"] != "" && values["client_key"] != "" {
+				// client certificate authentication
+
+				broker.ClientCert = values["client_cert"]
+				broker.ClientKey = values["client_key"]
+			}
+
+			// validate certificate
 			broker.TLSConfig, err = NewTLSConfig(broker)
 			if err != nil {
 				return nil, err
@@ -336,7 +359,7 @@ func MQTTConnect(gwName string, b *Broker) (*MQTT.Client, error) {
 
 	opts.SetUsername(b.Username)
 	opts.SetPassword(b.Password)
-	if !config.IsNil(b.WillMessage) {
+	if b.IsWill {
 		willTopic := b.WillTopic
 		willQoS := 0
 		opts.SetBinaryWill(willTopic, b.WillMessage, byte(willQoS), true)

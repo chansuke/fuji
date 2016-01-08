@@ -16,6 +16,9 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"os/exec"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -27,6 +30,8 @@ import (
 	"github.com/shiguredo/fuji/config"
 	"github.com/shiguredo/fuji/gateway"
 )
+
+var tmpTomlName = ".tmp.toml"
 
 // TestWillJustPublish tests
 // 1. connect localhost broker with will message
@@ -82,7 +87,7 @@ func TestWillWithPrefixSubscribePublishClose(t *testing.T) {
 	    payload = "Hello will with prefix."
 `
 	expectedWill := true
-	ok := genericWillTestDriver(t, configStr, "prefix/testprefixwill/will", []byte("Hello will with prefix."), expectedWill)
+	ok := genericWillTestDriver(t, configStr, "prefix/testprefixwill/will", []byte("no letter is good letter."), expectedWill)
 	assert.True(ok, "Failed to receive Will with prefix message")
 }
 
@@ -108,8 +113,8 @@ func TestNoWillSubscribePublishClose(t *testing.T) {
 	    payload = "Hello will just publish world."
 `
 	expectedWill := false
-	ok := genericWillTestDriver(t, configStr, "testnowillafterclose/will", []byte(""), expectedWill)
-	assert.True(ok, "Failed to receive Will message")
+	ok := genericWillTestDriver(t, configStr, "/testnowillafterclose/will", []byte(""), expectedWill)
+	assert.False(ok, "Failed to receive Will message")
 }
 
 // TestWillSubscribePublishClose
@@ -208,7 +213,7 @@ func TestWillSubscribePublishWillWithWillTopic(t *testing.T) {
 func TestWillSubscribePublishWillWithNestedWillTopic(t *testing.T) {
 	configStr := `
 	[gateway]
-	    name = "with"
+	    name = "withnested"
 	[[broker."local/1"]]
 	    host = "localhost"
 	    port = 1883
@@ -218,7 +223,7 @@ func TestWillSubscribePublishWillWithNestedWillTopic(t *testing.T) {
 	expectedWill := true
 	ok := genericWillTestDriver(t, configStr, "/willtopic/nested", []byte("msg"), expectedWill)
 	if !ok {
-		t.Error("Failed to receive Empty Will message")
+		t.Error("Failed to receive nested willtopic Will message")
 	}
 }
 
@@ -234,30 +239,46 @@ func genericWillTestDriver(t *testing.T, configStr string, expectedTopic string,
 
 	conf, err := config.LoadConfigByte([]byte(configStr))
 	assert.Nil(err)
-	commandChannel := make(chan string)
-	go fuji.StartByFileWithChannel(conf, commandChannel)
 
+	// write config string to temporal file
+	f, err := os.Create(tmpTomlName)
+	if err != nil {
+		t.Error(err)
+	}
+	_, err = f.WriteString(configStr)
+	if err != nil {
+		t.Error(err)
+	}
+	f.Sync()
+
+	// execute fuji as external process
+	fujiPath, err := filepath.Abs("../fuji")
+	if err != nil {
+		t.Error("file path not found")
+	}
+	cmd := exec.Command(fujiPath, "-c", tmpTomlName)
+	err = cmd.Start()
+	if err != nil {
+		t.Error(err)
+	}
+
+	// subscriber setup
 	gw, err := gateway.NewGateway(conf)
 	assert.Nil(err)
 
 	brokers, err := broker.NewBrokers(conf, gw.BrokerChan)
 	assert.Nil(err)
 
+	subscriberChannel, err := setupWillSubscriber(gw, brokers[0], t)
+	if err != config.Error("") {
+		t.Error(err)
+	}
+
+	fin := make(chan bool)
+
 	go func() {
-		time.Sleep(1 * time.Second)
-
-		subscriberChannel, err := setupWillSubscriber(gw, brokers[0])
-		if err != config.Error("") {
-			t.Error(err)
-		}
-
-		time.Sleep(1 * time.Second)
-
-		// kill publisher
-		brokers[0].FourceClose()
-		fmt.Println("broker killed for getting will message")
-
 		// check will message
+		willCame := true
 		select {
 		case willMsg := <-subscriberChannel:
 			if expectedWill {
@@ -271,16 +292,27 @@ func genericWillTestDriver(t *testing.T, configStr string, expectedTopic string,
 			if expectedWill {
 				assert.Equal("will message received within 1 sec", "not completed")
 			}
+			willCame = false
 		}
-
+		fin <- willCame
 	}()
-	time.Sleep(3 * time.Second)
-	ok = true
+
+	// wait for startup of external command process
+	time.Sleep(time.Second * 1)
+
+	// kill publisher
+	err = cmd.Process.Kill()
+	if err != nil {
+		t.Error(err)
+	}
+	t.Log("broker killed for getting will message")
+
+	ok = <-fin
 	return ok
 }
 
 // setupWillSubscriber start subscriber process and returnes a channel witch can receive will message.
-func setupWillSubscriber(gw *gateway.Gateway, broker *broker.Broker) (chan MQTT.Message, config.Error) {
+func setupWillSubscriber(gw *gateway.Gateway, broker *broker.Broker, t *testing.T) (chan MQTT.Message, config.Error) {
 	// Setup MQTT pub/sub client to confirm published content.
 	//
 	messageOutputChannel := make(chan MQTT.Message)
@@ -293,6 +325,9 @@ func setupWillSubscriber(gw *gateway.Gateway, broker *broker.Broker) (chan MQTT.
 	opts.SetDefaultPublishHandler(func(client *MQTT.Client, msg MQTT.Message) {
 		messageOutputChannel <- msg
 	})
+	willQoS := 0
+	willTopic := broker.WillTopic
+	t.Logf("expected will_topic: %s", willTopic)
 
 	client := MQTT.NewClient(opts)
 	if client == nil {
@@ -302,9 +337,7 @@ func setupWillSubscriber(gw *gateway.Gateway, broker *broker.Broker) (chan MQTT.
 		return nil, config.Error(fmt.Sprintf("NewClient Start failed %q", token.Error()))
 	}
 
-	qos := 0
-	willTopic := fmt.Sprintf("%s/%s/will", broker.TopicPrefix, gw.Name)
-	client.Subscribe(willTopic, byte(qos), func(client *MQTT.Client, msg MQTT.Message) {
+	client.Subscribe(willTopic, byte(willQoS), func(client *MQTT.Client, msg MQTT.Message) {
 		messageOutputChannel <- msg
 	})
 
