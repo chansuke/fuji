@@ -256,8 +256,6 @@ func genericWillTestDriver(t *testing.T, configStr string, expectedTopic string,
 	if err != nil {
 		t.Error("file path not found")
 	}
-	fmt.Println(fujiPath)
-	fmt.Println(tmpTomlName)
 	cmd := exec.Command(fujiPath, "-c", tmpTomlName)
 	err = cmd.Start()
 	if err != nil {
